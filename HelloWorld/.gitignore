@@ -1,12 +1,15 @@
-# files for the dex VM
+# Files for the dex VM
 *.dex
 
 # Java class files
 *.class
 
-# generated files
+# Generated files
 bin/
 gen/
+
+# Support libraries (too big to include in Google Code)
+libs/
 
 # Ignore gradle files
 .gradle/
