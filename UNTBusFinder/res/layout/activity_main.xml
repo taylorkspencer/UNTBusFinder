@@ -5,20 +5,20 @@
     <Button
         android:id="@+id/get_coordinates"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:text="@string/get_location"
         />
     <Button 
         android:id="@+id/bounce_coordinates"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:text="@string/bounce"/>
     <Button
         android:id="@+id/plot_coordinates"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:text="@string/plot_location" />
 </LinearLayout>
