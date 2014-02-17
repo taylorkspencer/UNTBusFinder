@@ -2,5 +2,7 @@
 <resources>
 	<string name="app_name">UNT Bus Finder</string>
 	<string name="action_settings">Settings</string>
-	<string name="hello_world">Hello world!</string>
+	<string name="get_location">Get Location</string>
+	<string name="bounce">Bounce</string>
+	<string name="plot_location">Plot Location</string>
 </resources>
