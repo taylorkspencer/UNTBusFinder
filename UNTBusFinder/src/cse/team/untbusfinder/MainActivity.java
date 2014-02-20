@@ -28,7 +28,7 @@ public class MainActivity extends Activity
 
 	}
 	
-	//TODO: 
+	//TODO: Show coordinates as a toast
 	// Called when the user clicks the Bounce button
 	public void bounce_coordinates(View view)
 	{
@@ -36,7 +36,7 @@ public class MainActivity extends Activity
 		
 	}
 	
-	//TODO: Take the user's coordinates and displays them on a map
+	//TODO: Take the user's coordinates and displays them on a map (Taylor's)
 	// Called when the user clicks the Map Coordinates button
 	public void map_coordinates(View view)
 	{
