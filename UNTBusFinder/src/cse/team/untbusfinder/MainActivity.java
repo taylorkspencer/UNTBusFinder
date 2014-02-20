@@ -20,18 +20,24 @@ public class MainActivity extends Activity
 		return true;
 	}
 	
-	/** Called when the user clicks the Get Coordinates button */
-	public void get_coordinates(View view) {
+	//TODO: Called when the user clicks the Get Coordinates button
+	public void get_coordinates(View view)
+	{
 	    // Do something in response to button
+		
 	}
 	
-	/** Called when the user clicks the Bounce button */
-	public void bounce_coordinates(View view) {
+	//TODO: Called when the user clicks the Bounce button
+	public void bounce_coordinates(View view)
+	{
 	    // Do something in response to button
+		
 	}
 	
-	/** Called when the user clicks the Map Coordinates button */
-	public void map_coordinates(View view) {
+	//TODO: Called when the user clicks the Map Coordinates button
+	public void map_coordinates(View view)
+	{
 	    // Do something in response to button
+		
 	}
 }
