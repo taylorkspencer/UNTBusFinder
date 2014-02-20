@@ -28,7 +28,7 @@ public class MainActivity extends Activity
 		
 	}
 	
-	//TODO: 
+	//TODO: Show coordinates as a toast
 	// Called when the user clicks the Bounce button
 	public void bounce_coordinates(View view)
 	{
