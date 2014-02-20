@@ -25,7 +25,7 @@ public class MainActivity extends Activity
 	public void get_coordinates(View view)
 	{
 	    // Do something in response to button
-		
+
 	}
 	
 	//TODO: 
