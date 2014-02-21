@@ -1,9 +1,12 @@
 package cse.team.untbusfinder;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainActivity extends Activity
 {
@@ -32,7 +35,14 @@ public class MainActivity extends Activity
 	// Called when the user clicks the Bounce button
 	public void bounce_coordinates(View view)
 	{
-	    // Do something in response to button
+		//Need to get the coordinates from their internal location in storage
+		Context context = getApplicationContext();
+		CharSequence temptext = "Coordinates will be shown here."; //Placeholder for coordinates
+		int duration = Toast.LENGTH_LONG;
+
+		Toast toast = Toast.makeText(context, temptext, duration);
+		toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+		toast.show();
 		
 	}
 	
