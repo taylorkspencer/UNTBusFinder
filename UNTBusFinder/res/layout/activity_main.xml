@@ -6,7 +6,8 @@
 		  android:layout_width="fill_parent"
 		  android:layout_height="0dp"
 		  android:layout_weight="1"
-		  android:text="@string/get_coordinates"/>
+		  android:text="@string/get_coordinates"
+		  android:onClick="get_coordinates"/>
 	<Button android:id="@+id/bounce_coordinates"
 		  android:layout_width="fill_parent"
 		  android:layout_height="0dp"
@@ -17,5 +18,6 @@
 		  android:layout_width="fill_parent"
 		  android:layout_height="0dp"
 		  android:layout_weight="1"
-		  android:text="@string/plot_location"/>
+		  android:text="@string/plot_location"
+		  android:onClick="map_coordinates"/>
 </LinearLayout>

@@ -13,7 +13,6 @@ import android.location.Criteria;
 import android.location.LocationListener;
 
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 
 public class MainActivity extends Activity
@@ -60,37 +59,50 @@ public class MainActivity extends Activity
 		
 	}
 	
-	//TODO: Take the user's coordinates and displays them on a map (Taylor's)
+	// Take the user's coordinates and displays them on a map
 	// Called when the user clicks the Map Coordinates button
+	//TODO: Stop polling for location when UNT Bus Finder closes (currently must
+	// dismiss app to stop location polling)
 	public void map_coordinates(View view)
 	{
-	    //TODO: Create a OpenStreetMaps view (I am using OSM here because Google
+	    // Create a OpenStreetMaps view (I am using OSM here because Google
 		// requires an API key)
 		// In order to build, you will need to download osmdroid-android-4.1.jar
-		// to libs/ since those files are not on the git repository
+		// and slf4j-android-1.5.8.jar to libs/ since those files are not on the
+		// git repository
 		
-		//TODO: Set up the map control
+		// Set up the map control
 		mapView = new MapView(this, 256);
 		mapView.setClickable(true);
 		mapView.setBuiltInZoomControls(true);
 		
-		//TODO: Get the user's location and display it on the map control
+		// Get the user's location and display it on the map control
 		locMgr = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-		//TODO: Determine the best LocationProvider for now
+		// Determine the best LocationProvider for now
 		locCriteria = new Criteria();
 		locCriteria.setAccuracy(Criteria.ACCURACY_FINE);
 		bestProvider = locMgr.getBestProvider(locCriteria, true);
-		//TODO: Get the last known location from the LocationProvider and set the
-		// map control to that
-		mapView.getController().setCenter(new GeoPoint(locMgr.getLastKnownLocation(bestProvider)));
+		// Set the initial zoom level
+		mapView.getController().setZoom(15);
 		
-		//TODO: Listen for a location update and if one is received, change the map
+		// Get the last known location from the LocationProvider and set the
+		// map control to that
+		if (locMgr.getLastKnownLocation(bestProvider)!=null)
+		{
+			mapView.getController().setCenter(new GeoPoint(locMgr.getLastKnownLocation(bestProvider)));
+		}
+		
+		
+		// Listen for a location update and if one is received, change the map
 		// control to that location
 		locMgr.requestLocationUpdates(bestProvider, 1000, 1, new LocationListener()
 		{
 			@Override public void onLocationChanged(Location location)
 			{
-				mapView.getController().setCenter(new GeoPoint(locMgr.getLastKnownLocation(bestProvider)));
+				if (location!=null)
+				{
+					mapView.getController().setCenter(new GeoPoint(location));
+				}
 			}
 			
 			@Override public void onProviderDisabled(String provider)
@@ -115,7 +127,7 @@ public class MainActivity extends Activity
 			}
 		});
 		
-		//TODO: Display the map control (unfortunately, this knocks off all the
+		// Display the map control (unfortunately, this knocks off all the
 		// other controls!)
 		setContentView(mapView);
 	}
