@@ -8,9 +8,6 @@
 bin/
 gen/
 
-# Support libraries (too big to include in Google Code)
-libs/
-
 # Ignore gradle files
 .gradle/
 build/
