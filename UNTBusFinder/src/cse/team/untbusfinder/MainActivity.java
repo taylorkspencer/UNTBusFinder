@@ -24,6 +24,8 @@ public class MainActivity extends Activity
 	Criteria locCriteria;
 	GPSretrieve gps;
 	Button get_coordinates;
+	double latitude;
+	double longitude;
 	
 	@Override protected void onCreate(Bundle savedInstanceState)
 	{
@@ -55,8 +57,8 @@ public class MainActivity extends Activity
 		gps = new GPSretrieve(MainActivity.this);
 		
 		if(gps.canGetLocation()){
-			double latitude = gps.getLatitude();
-			double longitude = gps.getLongitude();
+			latitude = gps.getLatitude();
+			longitude = gps.getLongitude();
 			
 			Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
 		}
