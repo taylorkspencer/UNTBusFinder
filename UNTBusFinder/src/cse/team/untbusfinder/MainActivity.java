@@ -11,7 +11,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.Criteria;
 import android.location.LocationListener;
-
+import android.widget.Button;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
@@ -22,11 +22,23 @@ public class MainActivity extends Activity
 	String bestProvider;
 	LocationManager locMgr;
 	Criteria locCriteria;
+	GPSretrieve gps;
+	Button get_coordinates;
 	
 	@Override protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		get_coordinates = (Button) findViewById(R.id.get_coordinates);
+        
+        // show location button click event
+        get_coordinates.setOnClickListener(new View.OnClickListener() {
+        	@Override
+            public void onClick(View view) {        
+                get_coordinates(view);
+        	}
+        });
 	}
 	
 	@Override public boolean onCreateOptionsMenu(Menu menu)
@@ -40,7 +52,17 @@ public class MainActivity extends Activity
 	// Called when the user clicks the Get Coordinates button
 	public void get_coordinates(View view)
 	{
-	    // Do something in response to button
+		gps = new GPSretrieve(MainActivity.this);
+		
+		if(gps.canGetLocation()){
+			double latitude = gps.getLatitude();
+			double longitude = gps.getLongitude();
+			
+			Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+		}
+		else{
+			gps.showSettingsAlert();
+		}
 
 	}
 	
