@@ -60,7 +60,8 @@ public class MainActivity extends Activity
 			latitude = gps.getLatitude();
 			longitude = gps.getLongitude();
 			
-			Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+			//This toast no longer needs to be here, as it is present in the bounce_coordinates method
+			//Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
 		}
 		else{
 			gps.showSettingsAlert();
@@ -74,7 +75,7 @@ public class MainActivity extends Activity
 	{
 		//Need to get the coordinates from their internal location in storage
 		Context context = getApplicationContext();
-		CharSequence temptext = "Coordinates will be shown here."; //Placeholder for coordinates
+		CharSequence temptext = "Latitude: " + latitude + "\nLongitude: " + longitude; //Show coordinates
 		int duration = Toast.LENGTH_LONG;
 
 		Toast toast = Toast.makeText(context, temptext, duration);
