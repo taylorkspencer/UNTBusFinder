@@ -33,14 +33,15 @@ public class MainActivity extends Activity
 		setContentView(R.layout.activity_main);
 		
 		get_coordinates = (Button) findViewById(R.id.get_coordinates);
-        
-        // show location button click event
-        get_coordinates.setOnClickListener(new View.OnClickListener() {
-        	@Override
-            public void onClick(View view) {        
-                get_coordinates(view);
-        	}
-        });
+		
+		// Show location button click event
+		get_coordinates.setOnClickListener(new View.OnClickListener()
+		{
+			@Override public void onClick(View view)
+			{
+				get_coordinates(view);
+			}
+		});
 	}
 	
 	@Override public boolean onCreateOptionsMenu(Menu menu)
@@ -56,32 +57,32 @@ public class MainActivity extends Activity
 	{
 		gps = new GPSretrieve(MainActivity.this);
 		
-		if(gps.canGetLocation()){
+		if (gps.canGetLocation())
+		{
 			latitude = gps.getLatitude();
 			longitude = gps.getLongitude();
 			
 			//This toast no longer needs to be here, as it is present in the bounce_coordinates method
 			//Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
 		}
-		else{
+		else
+		{
 			gps.showSettingsAlert();
 		}
-
 	}
 	
 	//TODO: Show coordinates as a toast
 	// Called when the user clicks the Bounce button
 	public void bounce_coordinates(View view)
 	{
-		//Need to get the coordinates from their internal location in storage
+		// Need to get the coordinates from their internal location in storage
 		Context context = getApplicationContext();
 		CharSequence temptext = "Latitude: " + latitude + "\nLongitude: " + longitude; //Show coordinates
 		int duration = Toast.LENGTH_LONG;
-
+		
 		Toast toast = Toast.makeText(context, temptext, duration);
 		toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
 		toast.show();
-		
 	}
 	
 	// Take the user's coordinates and displays them on a map
@@ -90,7 +91,7 @@ public class MainActivity extends Activity
 	// dismiss app to stop location polling)
 	public void map_coordinates(View view)
 	{
-	    // Create a OpenStreetMaps view (I am using OSM here because Google
+		// Create a OpenStreetMaps view (I am using OSM here because Google
 		// requires an API key)
 		// In order to build, you will need to download osmdroid-android-4.1.jar
 		// and slf4j-android-1.5.8.jar to libs/ since those files are not on the
@@ -102,6 +103,7 @@ public class MainActivity extends Activity
 		mapView.setBuiltInZoomControls(true);
 		
 		// Get the user's location and display it on the map control
+		//TODO: Switch this code to GPSretrieve functions
 		locMgr = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		// Determine the best LocationProvider for now
 		locCriteria = new Criteria();
