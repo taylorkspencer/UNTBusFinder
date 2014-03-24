@@ -12,6 +12,7 @@ import android.location.LocationManager;
 import android.location.Criteria;
 import android.location.LocationListener;
 import android.widget.Button;
+
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
