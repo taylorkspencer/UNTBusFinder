@@ -33,7 +33,7 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		get_coordinates = (Button) findViewById(R.id.get_coordinates);
+		get_coordinates = (Button)findViewById(R.id.get_coordinates);
 		
 		// Show location button click event
 		get_coordinates.setOnClickListener(new View.OnClickListener()
@@ -43,6 +43,16 @@ public class MainActivity extends Activity
 				get_coordinates(view);
 			}
 		});
+		
+		//TODO: Register the GPSretrieve class object
+		gps = new GPSretrieve(getApplicationContext());
+		
+		//TODO: Set up the OpenStreetMaps view
+		mapView = new MapView(this, 256);
+		mapView.setClickable(true);
+		mapView.setBuiltInZoomControls(true);
+		// Set the initial zoom level
+		mapView.getController().setZoom(15);
 	}
 	
 	@Override public boolean onCreateOptionsMenu(Menu menu)
@@ -90,40 +100,19 @@ public class MainActivity extends Activity
 	// Called when the user clicks the Map Coordinates button
 	//TODO: Stop polling for location when UNT Bus Finder closes (currently must
 	// dismiss app to stop location polling)
+	//TODO: Switch this code to GPSretrieve functions
 	public void map_coordinates(View view)
 	{
-		// Create a OpenStreetMaps view (I am using OSM here because Google
-		// requires an API key)
-		// In order to build, you will need to download osmdroid-android-4.1.jar
-		// and slf4j-android-1.5.8.jar to libs/ since those files are not on the
-		// git repository
-		
-		// Set up the map control
-		mapView = new MapView(this, 256);
-		mapView.setClickable(true);
-		mapView.setBuiltInZoomControls(true);
-		
-		// Get the user's location and display it on the map control
-		//TODO: Switch this code to GPSretrieve functions
-		locMgr = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-		// Determine the best LocationProvider for now
-		locCriteria = new Criteria();
-		locCriteria.setAccuracy(Criteria.ACCURACY_FINE);
-		bestProvider = locMgr.getBestProvider(locCriteria, true);
-		// Set the initial zoom level
-		mapView.getController().setZoom(15);
-		
-		// Get the last known location from the LocationProvider and set the
-		// map control to that
-		if (locMgr.getLastKnownLocation(bestProvider)!=null)
+		//TODO: Get the last known location from GPSretrieve and set the map
+		// control to that
+		if (gps.getLocation()!=null)
 		{
-			mapView.getController().setCenter(new GeoPoint(locMgr.getLastKnownLocation(bestProvider)));
+			mapView.getController().setCenter(new GeoPoint(gps.getLocation()));
 		}
 		
-		
-		// Listen for a location update and if one is received, change the map
+		//TODO: Listen for a location update and if one is received, change the map
 		// control to that location
-		locMgr.requestLocationUpdates(bestProvider, 1000, 1, new LocationListener()
+		gps.requestLocationUpdates(new GPSretrieveListener()
 		{
 			@Override public void onLocationChanged(Location location)
 			{
@@ -131,27 +120,6 @@ public class MainActivity extends Activity
 				{
 					mapView.getController().setCenter(new GeoPoint(location));
 				}
-			}
-			
-			@Override public void onProviderDisabled(String provider)
-			{
-				if (provider.equals(bestProvider))
-				{
-					// Get a new best LocationProvider
-					locMgr.getBestProvider(locCriteria, true);
-				}
-			}
-			
-			@Override public void onProviderEnabled(String provider)
-			{
-				// Get a new best LocationProvider
-				locMgr.getBestProvider(locCriteria, true);
-			}
-			
-			@Override public void onStatusChanged(String provider, int status, Bundle extras)
-			{
-				// Get a new best LocationProvider
-				locMgr.getBestProvider(locCriteria, true);
 			}
 		});
 		
