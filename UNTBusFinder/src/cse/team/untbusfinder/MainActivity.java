@@ -44,10 +44,10 @@ public class MainActivity extends Activity
 			}
 		});
 		
-		//TODO: Register the GPSretrieve class object
+		// Register the GPSretrieve class object
 		gps = new GPSretrieve(getApplicationContext());
 		
-		//TODO: Set up the OpenStreetMaps view
+		// Set up the OpenStreetMaps view
 		mapView = new MapView(this, 256);
 		mapView.setClickable(true);
 		mapView.setBuiltInZoomControls(true);
@@ -100,19 +100,18 @@ public class MainActivity extends Activity
 	// Called when the user clicks the Map Coordinates button
 	//TODO: Stop polling for location when UNT Bus Finder closes (currently must
 	// dismiss app to stop location polling)
-	//TODO: Switch this code to GPSretrieve functions
 	public void map_coordinates(View view)
 	{
-		//TODO: Get the last known location from GPSretrieve and set the map
+		// Get the last known location from GPSretrieve and set the map
 		// control to that
 		if (gps.getLocation()!=null)
 		{
 			mapView.getController().setCenter(new GeoPoint(gps.getLocation()));
 		}
 		
-		//TODO: Listen for a location update and if one is received, change the map
+		// Listen for a location update and if one is received, change the map
 		// control to that location
-		gps.requestLocationUpdates(new GPSretrieveListener()
+		gps.requestLocationUpdates(new LocationListener()
 		{
 			@Override public void onLocationChanged(Location location)
 			{
@@ -121,10 +120,28 @@ public class MainActivity extends Activity
 					mapView.getController().setCenter(new GeoPoint(location));
 				}
 			}
+			
+			@Override public void onProviderDisabled(String provider)
+			{
+				// Do nothing - we don't care about this change
+			}
+			
+			@Override public void onProviderEnabled(String provider)
+			{
+				// Do nothing - we don't care about this change
+			}
+			
+			@Override public void onStatusChanged(String provider, int status, Bundle bundle)
+			{
+				// Do nothing - we don't care about this change
+			}
 		});
 		
 		// Display the map control (unfortunately, this knocks off all the
 		// other controls!)
 		setContentView(mapView);
+		
+		// Begin polling for location
+		gps.startPolling();
 	}
 }

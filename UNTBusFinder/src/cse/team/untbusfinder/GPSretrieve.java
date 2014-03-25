@@ -1,5 +1,7 @@
 package cse.team.untbusfinder;
 
+import java.util.ArrayList;
+
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
@@ -13,8 +15,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 
-//TODO: Reconcile this code with the location code in map_coordinates
-//TODO: Find a way to notify the main thread
 public class GPSretrieve extends Service implements LocationListener
 {
 	// Variables declared here so that they can be accessed in the LocationListener
@@ -27,35 +27,40 @@ public class GPSretrieve extends Service implements LocationListener
 	protected LocationManager locMgr;
 	Location lastLocation;
 	
+	// An ArrayList of LocationListeners is declared here so that other classes
+	// can listen for location updates
+	ArrayList<LocationListener> listeners = new ArrayList<LocationListener>();
+	
+	// Constants
 	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
 	private static final long MIN_TIME_BTWN_UPDATES = 1000*60*1;
 		
 	public GPSretrieve(Context context)
 	{
-		//TODO: Store the context and the LocationManager from the system
+		// Store the context and the LocationManager from the system
 		mContext = context;
 		locMgr = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
 	}
 	
-	//TODO: Start polling for location updates
+	// Start polling for location updates
 	public void startPolling()
 	{
 		try
 		{
-			//TODO: Listen for location updates from the network provider and if one is
+			// Listen for location updates from the network provider and if one is
 			// received, change the location variable to that location
 			locMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
 											MIN_TIME_BTWN_UPDATES,
 											MIN_DISTANCE_CHANGE_FOR_UPDATES,
 											this);
-			//TODO: Listen for location updates from the GPS provider and if one is
+			// Listen for location updates from the GPS provider and if one is
 			// received, change the location variable to that location
 			locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 											MIN_TIME_BTWN_UPDATES,
 											MIN_DISTANCE_CHANGE_FOR_UPDATES,
 											this);
 			
-			//TODO: If all this is successful, set isPolling to true to indicate that
+			// If all this is successful, set isPolling to true to indicate that
 			// polling for location has begun
 			isPolling = true;
 		}
@@ -73,7 +78,7 @@ public class GPSretrieve extends Service implements LocationListener
 			//TODO: Stop listening for location updates
 			locMgr.removeUpdates(this);
 			
-			//TODO: If all this is successful, set isPolling to false to indicate that
+			// If all this is successful, set isPolling to false to indicate that
 			// polling for location has stopped
 			isPolling = false;
 		}
@@ -83,16 +88,16 @@ public class GPSretrieve extends Service implements LocationListener
 		}
 	}
 	
-	//TODO: Returns whether GPSretrieve is actively polling for location
+	// Returns whether GPSretrieve is actively polling for location
 	public boolean isPolling()
 	{
 		return isPolling;
 	}
 	
-	//TODO: Return the most recent location available
+	// Return the most recent location available
 	public Location getLocation()
 	{
-		//TODO: If lastLocation is null, query the passive location providers for
+		// If lastLocation is null, query the passive location providers for
 		// its last known location to provide a location until we get one
 		// from one of the providers
 		if (lastLocation==null)
@@ -102,11 +107,13 @@ public class GPSretrieve extends Service implements LocationListener
 		return lastLocation;
 	}
 	
+	// Return the latitude from the most recent location
 	public double getLatitude()
 	{
 		return getLocation().getLatitude();
 	}
 	
+	// Return the longitude from the most recent location
 	public double getLongitude()
 	{
 		return getLocation().getLongitude();
@@ -155,22 +162,28 @@ public class GPSretrieve extends Service implements LocationListener
 		{
 			lastLocation = location;
 		}
+		
+		// Notify any listening threads about the location change
+		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
+		{
+			listeners.get(lIndex).onLocationChanged(location);
+		}
 	}
 	
 	@Override public void onProviderDisabled(String provider)
 	{
 		if (provider.equals(LocationManager.GPS_PROVIDER))
 		{
-			//TODO: Indicate that the GPS provider has been disabled
+			// Indicate that the GPS provider has been disabled
 			isGPSEnabled = false;
 		}
 		else if (provider.equals(LocationManager.NETWORK_PROVIDER))
 		{
-			//TODO: Indicate that the network provider has been disabled
+			// Indicate that the network provider has been disabled
 			isNetworkEnabled = false;
 		}
 		
-		//TODO: If neither the GPS nor the network is enabled, we won't be able to
+		// If neither the GPS nor the network is enabled, we won't be able to
 		// get a location, so set canGetLocation to false
 		if((!isGPSEnabled)&&(!isNetworkEnabled))
 		{
@@ -179,6 +192,12 @@ public class GPSretrieve extends Service implements LocationListener
 		else
 		{
 			this.canGetLocation = true;
+		}
+		
+		// Notify any listening threads about the provider change
+		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
+		{
+			listeners.get(lIndex).onProviderDisabled(provider);
 		}
 	}
 	
@@ -186,16 +205,16 @@ public class GPSretrieve extends Service implements LocationListener
 	{
 		if (provider.equals(LocationManager.GPS_PROVIDER))
 		{
-			//TODO: Indicate that the GPS provider has been enabled
+			// Indicate that the GPS provider has been enabled
 			isGPSEnabled = true;
 		}
 		else if (provider.equals(LocationManager.NETWORK_PROVIDER))
 		{
-			//TODO: Indicate that the network provider has been enabled
+			// Indicate that the network provider has been enabled
 			isNetworkEnabled = true;
 		}
 		
-		//TODO: If neither the GPS nor the network is enabled, we won't be able to
+		// If neither the GPS nor the network is enabled, we won't be able to
 		// get a location, so set canGetLocation to false
 		if((!isGPSEnabled)&&(!isNetworkEnabled))
 		{
@@ -204,47 +223,53 @@ public class GPSretrieve extends Service implements LocationListener
 		else
 		{
 			this.canGetLocation = true;
+		}
+		
+		// Notify any listening threads about the provider change
+		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
+		{
+			listeners.get(lIndex).onProviderEnabled(provider);
 		}
 	}
 	
 	@Override public void onStatusChanged(String provider, int status, Bundle extras)
 	{
-		//TODO: Determine if the GPS provider's status has changed
+		// Determine if the GPS provider's status has changed
 		if (provider.equals(LocationManager.GPS_PROVIDER))
 		{
-			//TODO: Determine if the provider has become available
+			// Determine if the provider has become available
 			if (status==LocationProvider.AVAILABLE)
 			{
-				//TODO: Indicate that the GPS provider has become available
+				// Indicate that the GPS provider has become available
 				isGPSEnabled = true;
 			}
-			//TODO: Determine if the provider has become unavailable
+			// Determine if the provider has become unavailable
 			else if ((status==LocationProvider.TEMPORARILY_UNAVAILABLE)||
 					(status==LocationProvider.OUT_OF_SERVICE))
 			{
-				//TODO: Indicate that the GPS provider has become unavailable
+				// Indicate that the GPS provider has become unavailable
 				isGPSEnabled = false;
 			}
 		}
-		//TODO: Determine if the network provider's status has changed
+		// Determine if the network provider's status has changed
 		else if (provider.equals(LocationManager.NETWORK_PROVIDER))
 		{
-			//TODO: Determine if the provider has become available
+			// Determine if the provider has become available
 			if (status==LocationProvider.AVAILABLE)
 			{
-				//TODO: Indicate that the network provider has become available
+				// Indicate that the network provider has become available
 				isNetworkEnabled = true;
 			}
-			//TODO: Determine if the provider has become unavailable
+			// Determine if the provider has become unavailable
 			else if ((status==LocationProvider.TEMPORARILY_UNAVAILABLE)||
 					(status==LocationProvider.OUT_OF_SERVICE))
 			{
-				//TODO: Indicate that the network provider has become unavailable
+				// Indicate that the network provider has become unavailable
 				isNetworkEnabled = false;
 			}
 		}
 		
-		//TODO: If neither the GPS nor the network is enabled, we won't be able to
+		// If neither the GPS nor the network is enabled, we won't be able to
 		// get a location, so set canGetLocation to false
 		if((!isGPSEnabled)&&(!isNetworkEnabled))
 		{
@@ -253,11 +278,30 @@ public class GPSretrieve extends Service implements LocationListener
 		else
 		{
 			this.canGetLocation = true;
+		}
+		
+		// Notify any listening threads about the status change
+		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
+		{
+			listeners.get(lIndex).onStatusChanged(provider, status, extras);
 		}
 	}
 	
 	@Override public IBinder onBind(Intent intent)
 	{
 		return null;
+	}
+	
+	// Add a LocationListener to the class so other classes can listen for
+	// location changes
+	public void requestLocationUpdates(LocationListener listener)
+	{
+		listeners.add(listener);
+	}
+	
+	// Remove a LocationListener from the class
+	public void removeUpdates(LocationListener listener)
+	{
+		listeners.remove(listener);
 	}
 }
