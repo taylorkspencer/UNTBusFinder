@@ -2,22 +2,31 @@
 	  android:layout_width="fill_parent"
 	  android:layout_height="fill_parent"
 	  android:orientation="vertical">
-	<Button android:id="@+id/get_coordinates"
+
+    <ImageView android:id="@+id/image_logo"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="15dp"
+        android:src="@android:drawable/sym_def_app_icon"/>
+
+	<Button android:id="@+id/button_Map"
 		  android:layout_width="fill_parent"
 		  android:layout_height="0dp"
 		  android:layout_weight="1"
-		  android:text="@string/get_coordinates"
-		  android:onClick="get_coordinates"/>
-	<Button android:id="@+id/bounce_coordinates"
+		  android:layout_marginTop="50dp"
+		  android:layout_marginBottom="15dp"
+		  android:layout_marginLeft="15dp"
+		  android:layout_marginRight="15dp"
+		  android:text="@string/map"/>
+	
+	<Button android:id="@+id/button_Routes"
 		  android:layout_width="fill_parent"
 		  android:layout_height="0dp"
 		  android:layout_weight="1"
-		  android:text="@string/bounce_coordinates"
-		  android:onClick="bounce_coordinates"/>
-	<Button android:id="@+id/plot_coordinates"
-		  android:layout_width="fill_parent"
-		  android:layout_height="0dp"
-		  android:layout_weight="1"
-		  android:text="@string/plot_location"
-		  android:onClick="map_coordinates"/>
+		  android:layout_marginTop="15dp"
+		  android:layout_marginBottom="50dp"
+		  android:layout_marginLeft="15dp"
+		  android:layout_marginRight="15dp"
+		  android:text="@string/routes"/>
 </LinearLayout>

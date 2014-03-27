@@ -33,7 +33,8 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		get_coordinates = (Button)findViewById(R.id.get_coordinates);
+		// The get_coordinates button does not exist anymore
+		//get_coordinates = (Button)findViewById(R.id.get_coordinates);
 		
 		// Show location button click event
 		get_coordinates.setOnClickListener(new View.OnClickListener()
