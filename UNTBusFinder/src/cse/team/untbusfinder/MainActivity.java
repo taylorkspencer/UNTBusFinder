@@ -63,7 +63,7 @@ public class MainActivity extends Activity
 	
 	// When the user clicks on the Discovery Park button, take them to the view that shows
 	// the map and route info
-	public void routes(View view)
+	public void showRoutes(View view)
 	{
 		Intent intent = new Intent(this, RouteActivity.class);
 		startActivity(intent);
@@ -73,7 +73,7 @@ public class MainActivity extends Activity
 	// Called when the user clicks the Map button
 	//TODO: Stop polling for location when UNT Bus Finder closes (currently must
 	// dismiss app to stop location polling)
-	public void general_map(View view)
+	public void showGeneralMap(View view)
 	{
 		// Get the last known location from GPSretrieve and set the map
 		// control to that
