@@ -1,20 +1,18 @@
 package cse.team.untbusfinder;
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.Bundle;
-import android.view.Gravity;
-import android.view.Menu;
-import android.view.View;
-import android.widget.Toast;
-import android.location.Location;
-import android.location.LocationManager;
-import android.location.Criteria;
-import android.location.LocationListener;
-import android.widget.Button;
-
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
 
 public class MainActivity extends Activity
 {
@@ -37,13 +35,13 @@ public class MainActivity extends Activity
 		//get_coordinates = (Button)findViewById(R.id.get_coordinates);
 		
 		// Show location button click event
-		get_coordinates.setOnClickListener(new View.OnClickListener()
-		{
-			@Override public void onClick(View view)
-			{
-				get_coordinates(view);
-			}
-		});
+		//get_coordinates.setOnClickListener(new View.OnClickListener()
+		//{
+			//@Override public void onClick(View view)
+			//{
+				//get_coordinates(view);
+			//}
+		//});
 		
 		// Register the GPSretrieve class object
 		gps = new GPSretrieve(getApplicationContext());
@@ -63,45 +61,19 @@ public class MainActivity extends Activity
 		return true;
 	}
 	
-	//TODO: Gets the coordinates representing the user's location
-	// Called when the user clicks the Get Coordinates button
-	public void get_coordinates(View view)
+	// When the user clicks on the Discovery Park button, take them to the view that shows
+	// the map and route info
+	public void routes(View view)
 	{
-		gps = new GPSretrieve(MainActivity.this);
-		
-		if (gps.canGetLocation())
-		{
-			latitude = gps.getLatitude();
-			longitude = gps.getLongitude();
-			
-			//This toast no longer needs to be here, as it is present in the bounce_coordinates method
-			//Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
-		}
-		else
-		{
-			gps.showSettingsAlert();
-		}
-	}
-	
-	//TODO: Show coordinates as a toast
-	// Called when the user clicks the Bounce button
-	public void bounce_coordinates(View view)
-	{
-		// Need to get the coordinates from their internal location in storage
-		Context context = getApplicationContext();
-		CharSequence temptext = "Latitude: " + latitude + "\nLongitude: " + longitude; //Show coordinates
-		int duration = Toast.LENGTH_LONG;
-		
-		Toast toast = Toast.makeText(context, temptext, duration);
-		toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-		toast.show();
+		Intent intent = new Intent(this, RouteActivity.class);
+		startActivity(intent);
 	}
 	
 	// Take the user's coordinates and displays them on a map
-	// Called when the user clicks the Map Coordinates button
+	// Called when the user clicks the Map button
 	//TODO: Stop polling for location when UNT Bus Finder closes (currently must
 	// dismiss app to stop location polling)
-	public void map_coordinates(View view)
+	public void general_map(View view)
 	{
 		// Get the last known location from GPSretrieve and set the map
 		// control to that
