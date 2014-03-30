@@ -2,6 +2,7 @@ package cse.team.untbusfinder;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,18 +26,23 @@ public class RouteActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_route);
-		// Show the Up button in the action bar.
+		
+		// Adjust the action bar for this activity
 		setupActionBar();
 	}
 	
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
+	//TODO: Adjust the action bar for this activity
 	private void setupActionBar()
 	{
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayOptions(ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE);
 	}
-
+	
+	//TODO: Go to the previous fragment, or if this is the home, hide
+	@Override public void onBackPressed()
+	{
+		
+	}
+	
 	@Override public boolean onCreateOptionsMenu(Menu menu)
 	{
 		// Inflate the menu; this adds items to the action bar if it is present.

@@ -4,6 +4,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 import android.app.Activity;
+import android.app.ActionBar;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.app.Fragment;
 
 public class MainActivity extends Activity
 {
@@ -52,6 +54,21 @@ public class MainActivity extends Activity
 		mapView.setBuiltInZoomControls(true);
 		// Set the initial zoom level
 		mapView.getController().setZoom(15);
+		
+		// Adjust the action bar for this activity
+		setupActionBar();
+	}
+	
+	//TODO: Adjust the action bar for this activity
+	private void setupActionBar()
+	{
+		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
+	}
+	
+	//TODO: Go to the previous fragment, or if this is the home, hide
+	@Override public void onBackPressed()
+	{
+		
 	}
 	
 	@Override public boolean onCreateOptionsMenu(Menu menu)
