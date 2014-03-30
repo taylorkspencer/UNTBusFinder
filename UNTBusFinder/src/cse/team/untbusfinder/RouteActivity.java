@@ -31,16 +31,44 @@ public class RouteActivity extends Activity
 		setupActionBar();
 	}
 	
-	//TODO: Adjust the action bar for this activity
+	// Adjust the action bar for this activity
 	private void setupActionBar()
 	{
-		getActionBar().setDisplayOptions(ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE);
+		// Determine if this activity is a child
+		if (!isTaskRoot())
+		{
+			// If so, enable the up option
+			getActionBar().setDisplayOptions(ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE);
+		}
+		else
+		{
+			// If not, disable the up option
+			getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
+		}
 	}
 	
-	//TODO: Go to the previous fragment, or if this is the home, hide
+	// Go to the previous activity, or if this is the first activity, hide
 	@Override public void onBackPressed()
 	{
-		
+		finish();
+	}
+	
+	// If there is a previous activity, navigate back to it
+	// Returns true if navigation occurred, otherwise return false
+	@Override public boolean onNavigateUp()
+	{
+		// Determine if this activity is a child
+		if (!isTaskRoot())
+		{
+			// If so, go to the previous activity and return true
+			onBackPressed();
+			return true;
+		}
+		else
+		{
+			// If not, do nothing and return false
+			return false;
+		}
 	}
 	
 	@Override public boolean onCreateOptionsMenu(Menu menu)
@@ -49,22 +77,13 @@ public class RouteActivity extends Activity
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-
-	@Override public boolean onOptionsItemSelected(MenuItem item)
+	
+	// If the location is not being sent to the server, stop polling for location
+	// when UNT Bus Finder closes
+	// (here as a placeholder for when we start polling for location in this
+	// activity)
+	@Override protected void onPause()
 	{
-		switch (item.getItemId())
-		{
-			case android.R.id.home:
-				// This ID represents the Home or Up button. In the case of this
-				// activity, the Up button is shown. Use NavUtils to allow users
-				// to navigate up one level in the application structure. For
-				// more details, see the Navigation pattern on Android Design:
-				//
-				// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-				//
-				NavUtils.navigateUpFromSameTask(this);
-				return true;
-		}
-		return super.onOptionsItemSelected(item);
+		super.onPause();
 	}
 }

@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-import android.app.Fragment;
 
 public class MainActivity extends Activity
 {
@@ -34,16 +33,16 @@ public class MainActivity extends Activity
 		setContentView(R.layout.activity_main);
 		
 		// The get_coordinates button does not exist anymore
-		//get_coordinates = (Button)findViewById(R.id.get_coordinates);
+		/*get_coordinates = (Button)findViewById(R.id.get_coordinates);
 		
 		// Show location button click event
-		//get_coordinates.setOnClickListener(new View.OnClickListener()
-		//{
-			//@Override public void onClick(View view)
-			//{
-				//get_coordinates(view);
-			//}
-		//});
+		get_coordinates.setOnClickListener(new View.OnClickListener()
+		{
+			@Override public void onClick(View view)
+			{
+				get_coordinates(view);
+			}
+		});*/
 		
 		// Register the GPSretrieve class object
 		gps = new GPSretrieve(getApplicationContext());
@@ -59,16 +58,44 @@ public class MainActivity extends Activity
 		setupActionBar();
 	}
 	
-	//TODO: Adjust the action bar for this activity
+	// Adjust the action bar for this activity
 	private void setupActionBar()
 	{
-		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
+		// Determine if this activity is a child
+		if (!isTaskRoot())
+		{
+			// If so, enable the up option
+			getActionBar().setDisplayOptions(ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE);
+		}
+		else
+		{
+			// If not, disable the up option
+			getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
+		}
 	}
 	
-	//TODO: Go to the previous fragment, or if this is the home, hide
+	// Go to the previous activity, or if this is the first activity, hide
 	@Override public void onBackPressed()
 	{
-		
+		finish();
+	}
+	
+	// If there is a previous activity, navigate back to it
+	// Returns true if navigation occurred, otherwise return false
+	@Override public boolean onNavigateUp()
+	{
+		// Determine if this activity is a child
+		if (!isTaskRoot())
+		{
+			// If so, go to the previous activity and return true
+			onBackPressed();
+			return true;
+		}
+		else
+		{
+			// If not, do nothing and return false
+			return false;
+		}
 	}
 	
 	@Override public boolean onCreateOptionsMenu(Menu menu)
@@ -88,8 +115,8 @@ public class MainActivity extends Activity
 	
 	// Take the user's coordinates and displays them on a map
 	// Called when the user clicks the Map button
-	//TODO: Stop polling for location when UNT Bus Finder closes (currently must
-	// dismiss app to stop location polling)
+	//TODO: Move this to a third activity because the way this shows the map
+	// doesn't work with the activity-driven back or up system
 	public void showGeneralMap(View view)
 	{
 		// Get the last known location from GPSretrieve and set the map
@@ -133,5 +160,14 @@ public class MainActivity extends Activity
 		
 		// Begin polling for location
 		gps.startPolling();
+	}
+	
+	// If the location is not being sent to the server, stop polling for location
+	// when UNT Bus Finder closes
+	@Override protected void onPause()
+	{
+		// Stop polling for location
+		gps.stopPolling();
+		super.onPause();
 	}
 }

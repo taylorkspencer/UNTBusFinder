@@ -1,15 +1,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <fragment android:name="Map"
-            android:id="@+id/map"
-            android:layout_weight=".8"
-            android:layout_width="match_parent"
-            android:layout_height="0dp" />
+	  android:orientation="vertical"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent">
+	<!-- Temporarily commented out to allow this activity to launch  -->
+	<!-- <fragment android:name="Map"
+		  android:id="@+id/map"
+		  android:layout_weight=".8"
+		  android:layout_width="match_parent"
+		  android:layout_height="0dp"/>
     <fragment android:name="Data"
-            android:id="@+id/data"
-            android:layout_weight=".2"
-            android:layout_width="match_parent"
-            android:layout_height="0dp" />
+		  android:id="@+id/data"
+		  android:layout_weight=".2"
+		  android:layout_width="match_parent"
+		  android:layout_height="0dp"/> -->
 </LinearLayout>
