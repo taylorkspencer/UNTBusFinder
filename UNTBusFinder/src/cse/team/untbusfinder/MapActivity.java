@@ -80,10 +80,7 @@ public class MapActivity extends Activity
 					myLocOverlay.setLocation(new GeoPoint(location));
 					
 					// Remove the old overlays and replace them with the new ones
-					mapView.getOverlays().clear();
-					mapView.getOverlays().add(myLocOverlay);
-					mapView.getOverlays().addAll(busStopOverlays);
-					mapView.getOverlays().addAll(busLocOverlays);
+					reloadOverlays();
 				}
 			}
 			
@@ -132,6 +129,15 @@ public class MapActivity extends Activity
 			// If not, disable the up option
 			getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
 		}
+	}
+	
+	//TODO: Remove the old overlays and replace them with the new ones
+	protected void reloadOverlays()
+	{
+		mapView.getOverlays().clear();
+		mapView.getOverlays().add(myLocOverlay);
+		mapView.getOverlays().addAll(busStopOverlays);
+		mapView.getOverlays().addAll(busLocOverlays);
 	}
 	
 	// Go to the previous activity, or if this is the first activity, hide
