@@ -1,31 +1,35 @@
 package cse.team.untbusfinder;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.OverlayManager;
+import org.osmdroid.views.overlay.SimpleLocationOverlay;
+import org.osmdroid.views.overlay.DirectedLocationOverlay;
 
 import android.app.Activity;
 import android.app.ActionBar;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
 
 public class MapActivity extends Activity
 {
 	// Variables declared here so that they can be accessed in the LocationListener
 	MapView mapView;
-	String bestProvider;
-	LocationManager locMgr;
-	Criteria locCriteria;
 	GPSretrieve gps;
-	Button get_coordinates;
-	double latitude;
-	double longitude;
+	SimpleLocationOverlay myLocOverlay;
+	List<SimpleLocationOverlay> busStopOverlays;
+	SimpleLocationOverlay busStopOverlayStyle;
+	List<DirectedLocationOverlay> busLocOverlays;
+	DirectedLocationOverlay busLocOverlayStyle;
 	
+	// Display the activity and register the controls
 	@Override protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
@@ -40,6 +44,19 @@ public class MapActivity extends Activity
 		// Set the initial zoom level
 		mapView.getController().setZoom(15);
 		
+		// Set up the overlays
+		myLocOverlay = new SimpleLocationOverlay(mapView.getContext());
+		busStopOverlayStyle = new SimpleLocationOverlay(mapView.getContext());
+		busLocOverlayStyle = new DirectedLocationOverlay(mapView.getContext());
+		
+		// Set up the lists for the overlays
+		busStopOverlays = new ArrayList<SimpleLocationOverlay>();
+		busLocOverlays = new ArrayList<DirectedLocationOverlay>();
+	}
+	
+	// Set the initial locations of the MapView and its Overlays
+	@Override protected void onStart()
+	{
 		// Get the last known location from GPSretrieve and set the map
 		// control to that
 		if (gps.getLocation()!=null)
@@ -53,9 +70,20 @@ public class MapActivity extends Activity
 		{
 			@Override public void onLocationChanged(Location location)
 			{
+				// Make sure the new location isn't null
 				if (location!=null)
 				{
+					// Center the map on the changed location
 					mapView.getController().setCenter(new GeoPoint(location));
+					
+					// Update the myLocOverlay to the changed location
+					myLocOverlay.setLocation(new GeoPoint(location));
+					
+					// Remove the old overlays and replace them with the new ones
+					mapView.getOverlays().clear();
+					mapView.getOverlays().add(myLocOverlay);
+					mapView.getOverlays().addAll(busStopOverlays);
+					mapView.getOverlays().addAll(busLocOverlays);
 				}
 			}
 			
@@ -77,6 +105,8 @@ public class MapActivity extends Activity
 		
 		// Adjust the action bar for this activity
 		setupActionBar();
+		
+		super.onStart();
 	}
 	
 	// Start and/or resume polling for location
