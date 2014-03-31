@@ -126,6 +126,18 @@ public class GPSretrieve extends Service implements LocationListener
 		return getLocation().getLongitude();
 	}
 	
+	// Return the bearing from the most recent location
+	public double getBearing()
+	{
+		return getLocation().getBearing();
+	}
+	
+	// Returns whether the most recent location has a bearing
+	public boolean hasBearing()
+	{
+		return getLocation().hasBearing();
+	}
+	
 	public boolean canGetLocation()
 	{
 		return this.canGetLocation;

@@ -24,8 +24,8 @@ public class MapActivity extends Activity
 	MapView mapView;
 	GPSretrieve gps;
 	PointOverlay myLocOverlay;
-	List<PointOverlay> busStopOverlays;
-	PointOverlay busStopOverlayStyle;
+	List<StationaryPointOverlay> busStopOverlays;
+	StationaryPointOverlay busStopOverlayStyle;
 	List<PointOverlay> busLocOverlays;
 	PointOverlay busLocOverlayStyle;
 	List<PathOverlay> busPathOverlays;
@@ -46,16 +46,13 @@ public class MapActivity extends Activity
 		// Set the initial zoom level
 		mapView.getController().setZoom(15);
 		
-		/* Temporarily commented out while the structure of the overlays is changing
 		// Set up the overlays
 		busPathOverlayStyle = new PathOverlay(Color.TRANSPARENT, mapView.getContext());
-		busStopOverlayStyle = new PointOverlay(mapView.getContext());
-		busLocOverlayStyle = new PointOverlay(mapView.getContext());
-		myLocOverlay = new PointOverlay(mapView.getContext());*/
+		busStopOverlayStyle = new StationaryPointOverlay(mapView.getContext());
 		
 		// Set up the lists for the overlays
 		busPathOverlays = new ArrayList<PathOverlay>();
-		busStopOverlays = new ArrayList<PointOverlay>();
+		busStopOverlays = new ArrayList<StationaryPointOverlay>();
 		busLocOverlays = new ArrayList<PointOverlay>();
 	}
 	
@@ -94,6 +91,9 @@ public class MapActivity extends Activity
 					{
 						myLocOverlay = new StationaryPointOverlay(mapView.getContext());
 					}
+					//TODO: Set the shared default attributes of the point
+					myLocOverlay = setMyLocOverlayAttributes(myLocOverlay);
+					
 					// Update the myLocOverlay to the changed location
 					myLocOverlay.setLocation(new GeoPoint(location));
 					
@@ -147,6 +147,34 @@ public class MapActivity extends Activity
 			// If not, disable the up option
 			getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
 		}
+	}
+	
+	//TODO: Set the shared default attributes for the myLocOverlay point
+	protected PointOverlay setMyLocOverlayAttributes(PointOverlay point)
+	{
+		//TODO: Set the appearance attributes of the point
+		point.setAlpha(255);
+		point.setColor(Color.BLUE);
+		point.setRadius(10);
+		return point;
+	}
+	
+	//TODO: Set the shared default attributes for the busLocOverlay point
+	protected PointOverlay setBusLocOverlayAttributes(PointOverlay point)
+	{
+		//TODO: Set the appearance attributes of the point
+		point.setAlpha(255);
+		point.setRadius(10);
+		return point;
+	}
+	
+	//TODO: Set the shared default attributes for the busStopOverlay point
+	protected PointOverlay setBusStopOverlayAttributes(PointOverlay point)
+	{
+		//TODO: Set the appearance attributes of the point
+		point.setAlpha(255);
+		point.setRadius(10);
+		return point;
 	}
 	
 	//TODO: Remove the old overlays and replace them with the new ones
