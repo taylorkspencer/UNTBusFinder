@@ -7,11 +7,11 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayManager;
-import org.osmdroid.views.overlay.SimpleLocationOverlay;
-import org.osmdroid.views.overlay.DirectedLocationOverlay;
+import org.osmdroid.views.overlay.PathOverlay;
 
 import android.app.Activity;
 import android.app.ActionBar;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -23,11 +23,13 @@ public class MapActivity extends Activity
 	// Variables declared here so that they can be accessed in the LocationListener
 	MapView mapView;
 	GPSretrieve gps;
-	SimpleLocationOverlay myLocOverlay;
-	List<SimpleLocationOverlay> busStopOverlays;
-	SimpleLocationOverlay busStopOverlayStyle;
-	List<DirectedLocationOverlay> busLocOverlays;
-	DirectedLocationOverlay busLocOverlayStyle;
+	PointOverlay myLocOverlay;
+	List<PointOverlay> busStopOverlays;
+	PointOverlay busStopOverlayStyle;
+	List<PointOverlay> busLocOverlays;
+	PointOverlay busLocOverlayStyle;
+	List<PathOverlay> busPathOverlays;
+	PathOverlay busPathOverlayStyle;
 	
 	// Display the activity and register the controls
 	@Override protected void onCreate(Bundle savedInstanceState)
@@ -44,14 +46,17 @@ public class MapActivity extends Activity
 		// Set the initial zoom level
 		mapView.getController().setZoom(15);
 		
+		/* Temporarily commented out while the structure of the overlays is changing
 		// Set up the overlays
-		myLocOverlay = new SimpleLocationOverlay(mapView.getContext());
-		busStopOverlayStyle = new SimpleLocationOverlay(mapView.getContext());
-		busLocOverlayStyle = new DirectedLocationOverlay(mapView.getContext());
+		busPathOverlayStyle = new PathOverlay(Color.TRANSPARENT, mapView.getContext());
+		busStopOverlayStyle = new PointOverlay(mapView.getContext());
+		busLocOverlayStyle = new PointOverlay(mapView.getContext());
+		myLocOverlay = new PointOverlay(mapView.getContext());*/
 		
 		// Set up the lists for the overlays
-		busStopOverlays = new ArrayList<SimpleLocationOverlay>();
-		busLocOverlays = new ArrayList<DirectedLocationOverlay>();
+		busPathOverlays = new ArrayList<PathOverlay>();
+		busStopOverlays = new ArrayList<PointOverlay>();
+		busLocOverlays = new ArrayList<PointOverlay>();
 	}
 	
 	// Set the initial locations of the MapView and its Overlays
@@ -76,6 +81,19 @@ public class MapActivity extends Activity
 					// Center the map on the changed location
 					mapView.getController().setCenter(new GeoPoint(location));
 					
+					//TODO: If there was a previous location, declare a MotionPointOverlay
+					// and set its point in the direction of the change
+					if (gps.getLastLocation()!=null)
+					{
+						myLocOverlay = new MotionPointOverlay(mapView.getContext());
+						
+						//TODO: Determine the direction of the change
+						
+					}
+					else
+					{
+						myLocOverlay = new StationaryPointOverlay(mapView.getContext());
+					}
 					// Update the myLocOverlay to the changed location
 					myLocOverlay.setLocation(new GeoPoint(location));
 					
@@ -135,9 +153,10 @@ public class MapActivity extends Activity
 	protected void reloadOverlays()
 	{
 		mapView.getOverlays().clear();
-		mapView.getOverlays().add(myLocOverlay);
+		mapView.getOverlays().addAll(busPathOverlays);
 		mapView.getOverlays().addAll(busStopOverlays);
 		mapView.getOverlays().addAll(busLocOverlays);
+		mapView.getOverlays().add(myLocOverlay);
 	}
 	
 	// Go to the previous activity, or if this is the first activity, hide

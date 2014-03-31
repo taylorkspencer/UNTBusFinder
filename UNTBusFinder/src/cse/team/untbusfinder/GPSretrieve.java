@@ -94,6 +94,13 @@ public class GPSretrieve extends Service implements LocationListener
 		return isPolling;
 	}
 	
+	// Return the last location, or null if there isn't any
+	// Used for comparing locations
+	public Location getLastLocation()
+	{
+		return lastLocation;
+	}
+	
 	// Return the most recent location available
 	public Location getLocation()
 	{
@@ -158,20 +165,26 @@ public class GPSretrieve extends Service implements LocationListener
 	
 	@Override public void onLocationChanged(Location location)
 	{
-		if (location!=null)
-		{
-			lastLocation = location;
-		}
-		
 		// Notify any listening threads about the location change
 		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
 		{
 			listeners.get(lIndex).onLocationChanged(location);
 		}
+		
+		if (location!=null)
+		{
+			lastLocation = location;
+		}
 	}
 	
 	@Override public void onProviderDisabled(String provider)
 	{
+		// Notify any listening threads about the provider change
+		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
+		{
+			listeners.get(lIndex).onProviderDisabled(provider);
+		}
+		
 		if (provider.equals(LocationManager.GPS_PROVIDER))
 		{
 			// Indicate that the GPS provider has been disabled
@@ -193,16 +206,16 @@ public class GPSretrieve extends Service implements LocationListener
 		{
 			this.canGetLocation = true;
 		}
-		
-		// Notify any listening threads about the provider change
-		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
-		{
-			listeners.get(lIndex).onProviderDisabled(provider);
-		}
 	}
 	
 	@Override public void onProviderEnabled(String provider)
 	{
+		// Notify any listening threads about the provider change
+		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
+		{
+			listeners.get(lIndex).onProviderEnabled(provider);
+		}
+		
 		if (provider.equals(LocationManager.GPS_PROVIDER))
 		{
 			// Indicate that the GPS provider has been enabled
@@ -224,16 +237,16 @@ public class GPSretrieve extends Service implements LocationListener
 		{
 			this.canGetLocation = true;
 		}
-		
-		// Notify any listening threads about the provider change
-		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
-		{
-			listeners.get(lIndex).onProviderEnabled(provider);
-		}
 	}
 	
 	@Override public void onStatusChanged(String provider, int status, Bundle extras)
 	{
+		// Notify any listening threads about the status change
+		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
+		{
+			listeners.get(lIndex).onStatusChanged(provider, status, extras);
+		}
+		
 		// Determine if the GPS provider's status has changed
 		if (provider.equals(LocationManager.GPS_PROVIDER))
 		{
@@ -278,12 +291,6 @@ public class GPSretrieve extends Service implements LocationListener
 		else
 		{
 			this.canGetLocation = true;
-		}
-		
-		// Notify any listening threads about the status change
-		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
-		{
-			listeners.get(lIndex).onStatusChanged(provider, status, extras);
 		}
 	}
 	
