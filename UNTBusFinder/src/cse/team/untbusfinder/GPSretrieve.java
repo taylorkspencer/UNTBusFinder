@@ -70,12 +70,12 @@ public class GPSretrieve extends Service implements LocationListener
 		}
 	}
 	
-	//TODO: Stop polling for location updates
+	// Stop polling for location updates
 	public void stopPolling()
 	{
 		try
 		{
-			//TODO: Stop listening for location updates
+			// Stop listening for location updates
 			locMgr.removeUpdates(this);
 			
 			// If all this is successful, set isPolling to false to indicate that

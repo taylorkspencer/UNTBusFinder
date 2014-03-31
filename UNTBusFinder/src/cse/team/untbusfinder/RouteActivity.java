@@ -31,6 +31,14 @@ public class RouteActivity extends Activity
 		setupActionBar();
 	}
 	
+	// Start and/or resume polling for location
+	// (here as a placeholder for when we start polling for location in this
+	// activity)
+	@Override protected void onResume()
+	{
+		super.onResume();
+	}
+	
 	// Adjust the action bar for this activity
 	private void setupActionBar()
 	{

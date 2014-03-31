@@ -1,31 +1,90 @@
 package cse.team.untbusfinder;
 
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+
 import android.app.Activity;
 import android.app.ActionBar;
-import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 
-public class MainActivity extends Activity
+public class MapActivity extends Activity
 {
+	// Variables declared here so that they can be accessed in the LocationListener
+	MapView mapView;
+	String bestProvider;
+	LocationManager locMgr;
+	Criteria locCriteria;
+	GPSretrieve gps;
+	Button get_coordinates;
+	double latitude;
+	double longitude;
+	
 	@Override protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);		
+		setContentView(R.layout.activity_map);
+		
+		// Register the GPSretrieve class object
+		gps = new GPSretrieve(getApplicationContext());
+		
+		// Set up the OpenStreetMaps view
+		mapView = (MapView)findViewById(R.id.generalMap);
+		mapView.setBuiltInZoomControls(true);
+		// Set the initial zoom level
+		mapView.getController().setZoom(15);
+		
+		// Get the last known location from GPSretrieve and set the map
+		// control to that
+		if (gps.getLocation()!=null)
+		{
+			mapView.getController().setCenter(new GeoPoint(gps.getLocation()));
+		}
+		
+		// Listen for a location update and if one is received, change the map
+		// control to that location
+		gps.requestLocationUpdates(new LocationListener()
+		{
+			@Override public void onLocationChanged(Location location)
+			{
+				if (location!=null)
+				{
+					mapView.getController().setCenter(new GeoPoint(location));
+				}
+			}
+			
+			@Override public void onProviderDisabled(String provider)
+			{
+				// Do nothing - we don't care about this change
+			}
+			
+			@Override public void onProviderEnabled(String provider)
+			{
+				// Do nothing - we don't care about this change
+			}
+			
+			@Override public void onStatusChanged(String provider, int status, Bundle bundle)
+			{
+				// Do nothing - we don't care about this change
+			}
+		});
 		
 		// Adjust the action bar for this activity
 		setupActionBar();
 	}
 	
 	// Start and/or resume polling for location
-	// (here as a placeholder for when we start polling for location in this
-	// activity)
 	@Override protected void onResume()
 	{
+		// Begin polling for location
+		gps.startPolling();
+		
 		super.onResume();
 	}
 	
@@ -76,28 +135,12 @@ public class MainActivity extends Activity
 		return true;
 	}
 	
-	// When the user clicks on the Discovery Park button, take them to the view that shows
-	// the map and route info
-	public void showRoutes(View view)
-	{
-		Intent showRoutes = new Intent(this, RouteActivity.class);
-		startActivity(showRoutes);
-	}
-	
-	// Take the user's coordinates and displays them on a map
-	// Called when the user clicks the Map button
-	public void showGeneralMap(View view)
-	{
-		Intent showGeneralMap = new Intent(this, MapActivity.class);
-		startActivity(showGeneralMap);
-	}
-	
 	// If the location is not being sent to the server, stop polling for location
 	// when UNT Bus Finder closes
-	// (here as a placeholder for when we start polling for location in this
-	// activity)
 	@Override protected void onPause()
 	{
+		// Stop polling for location
+		gps.stopPolling();
 		super.onPause();
 	}
 }
