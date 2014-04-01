@@ -59,6 +59,8 @@ public class MapActivity extends Activity
 	// Set the initial locations of the MapView and its Overlays
 	@Override protected void onStart()
 	{
+		super.onStart();
+		
 		// Get the last known location from GPSretrieve and set the map
 		// control to that
 		if (gps.getLocation()!=null)
@@ -120,8 +122,6 @@ public class MapActivity extends Activity
 		
 		// Adjust the action bar for this activity
 		setupActionBar();
-		
-		super.onStart();
 	}
 	
 	// Start and/or resume polling for location
