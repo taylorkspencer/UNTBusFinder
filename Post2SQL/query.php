@@ -3,9 +3,17 @@
   if (extension_loaded('mysqli'))
   {
   	//TODO: Check to make sure the user provided a POST argument
-  	if (isset($_POST[]))
+  	if ((isset($_POST["user"]))&&(isset($_POST["db"])))
   	{
+  		//TODO: Sanitize the POST arguments before using them with the database
+  		$user = mysqli::escape_string($_POST["user"]);
+  		$db = mysqli::escape_string($_POST["db"]);
   		
+  		//TODO: Log in to the database
+  		if ($mysqli = new mysqli("localhost", $user, , $db))
+  		{
+  			
+  		}
   	}
   	else
   	{
