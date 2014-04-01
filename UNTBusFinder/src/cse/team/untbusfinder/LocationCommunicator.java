@@ -30,8 +30,8 @@ public class LocationCommunicator extends Service implements LocationListener
 	
 	// Constants
 	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
-	private static final long MIN_TIME_BTWN_UPDATES = 1000*60*1;
-		
+	private static final long MIN_TIME_BTWN_UPDATES = 10000; // In milliseconds (10s interval)
+	
 	public LocationCommunicator()
 	{
 		
