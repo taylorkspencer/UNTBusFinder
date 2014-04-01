@@ -80,18 +80,18 @@ public class MapActivity extends Activity
 					
 					//TODO: If there was a previous location, declare a MotionPointOverlay
 					// and set its point in the direction of the change
-					if (gps.getLastLocation()!=null)
+					if ((gps.getLastLocation()!=null)&&(gps.hasBearing()))
 					{
 						myLocOverlay = new MotionPointOverlay(mapView.getContext());
 						
-						//TODO: Determine the direction of the change
-						
+						//TODO: Determine the direction of the change (this needs to be further tested)
+						myLocOverlay.setBearing(location.getBearing());
 					}
 					else
 					{
 						myLocOverlay = new StationaryPointOverlay(mapView.getContext());
 					}
-					//TODO: Set the shared default attributes of the point
+					// Set the shared default attributes of the point
 					myLocOverlay = setMyLocOverlayAttributes(myLocOverlay);
 					
 					// Update the myLocOverlay to the changed location
@@ -149,35 +149,35 @@ public class MapActivity extends Activity
 		}
 	}
 	
-	//TODO: Set the shared default attributes for the myLocOverlay point
+	// Set the shared default attributes for the myLocOverlay point
 	protected PointOverlay setMyLocOverlayAttributes(PointOverlay point)
 	{
-		//TODO: Set the appearance attributes of the point
+		// Set the appearance attributes of the point
 		point.setAlpha(255);
 		point.setColor(Color.BLUE);
 		point.setRadius(10);
 		return point;
 	}
 	
-	//TODO: Set the shared default attributes for the busLocOverlay point
+	// Set the shared default attributes for the busLocOverlay point
 	protected PointOverlay setBusLocOverlayAttributes(PointOverlay point)
 	{
-		//TODO: Set the appearance attributes of the point
+		// Set the appearance attributes of the point
 		point.setAlpha(255);
 		point.setRadius(10);
 		return point;
 	}
 	
-	//TODO: Set the shared default attributes for the busStopOverlay point
+	// Set the shared default attributes for the busStopOverlay point
 	protected PointOverlay setBusStopOverlayAttributes(PointOverlay point)
 	{
-		//TODO: Set the appearance attributes of the point
+		// Set the appearance attributes of the point
 		point.setAlpha(255);
 		point.setRadius(10);
 		return point;
 	}
 	
-	//TODO: Remove the old overlays and replace them with the new ones
+	// Remove the old overlays and replace them with the new ones
 	protected void reloadOverlays()
 	{
 		mapView.getOverlays().clear();

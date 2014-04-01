@@ -36,53 +36,59 @@ public abstract class PointOverlay extends Overlay
 		super(resourceProxy);
 	}
 	
-	//TODO:
+	// Set the color for the PointOverlay
 	public void setColor(int newColor)
 	{
 		pPaint.setColor(newColor);
 	}
 	
-	//TODO:
+	// Get the color for the PointOverlay
 	public int getColor()
 	{
 		return pPaint.getColor();
 	}
 	
-	//TODO:
+	// Set the alpha value for the PointOverlay
 	public void setAlpha(int newAlpha)
 	{
 		pPaint.setAlpha(newAlpha);
 	}
 	
-	//TODO:
+	// Get the alpha value for the PointOverlay
 	public int getAlpha()
 	{
 		return pPaint.getAlpha();
 	}
 	
-	//TODO:
+	// Set the location for the PointOverlay
 	public void setLocation(GeoPoint newLocation)
 	{
 		pLocation = newLocation;
 	}
 	
-	//TODO:
+	// Get the location for the PointOverlay
 	public GeoPoint getLocation()
 	{
 		return pLocation;
 	}
 	
-	//TODO:
+	// Set the radius for the PointOverlay
 	public void setRadius(float newRadius)
 	{
 		radius = newRadius;
 	}
 	
-	//TODO:
+	// Get the radius for the PointOverlay
 	public float getRadius()
 	{
 		return radius;
 	}
+	
+	// Set the bearing for the PointOverlay (unimplemented stub)
+	public abstract void setBearing(float newBearing);
+	
+	// Get the bearing for the PointOverlay (unimplemented stub)
+	public abstract float getBearing();
 	
 	// Unimplemented stub (PointOverlay, by design, isn't capable of drawing itself)
 	protected abstract void draw(final Canvas canvas, final MapView mapView, final boolean shadow);

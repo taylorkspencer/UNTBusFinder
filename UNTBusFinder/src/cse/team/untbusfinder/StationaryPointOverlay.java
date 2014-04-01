@@ -31,23 +31,37 @@ public class StationaryPointOverlay extends PointOverlay
 		super(resourceProxy);
 	}
 	
-	//TODO: Draw the StationaryPointOverlay to the MapView at the location
+	// Set the bearing for the StationaryPointOverlay
+	// Does nothing, as StationaryPointOverlay has no bearing
+	public void setBearing(float newBearing)
+	{
+		// Do nothing
+	}
+	
+	// Get the bearing for the MotionPointOverlay
+	// Always returns 0, as StationaryPointOverlay has no bearing
+	public float getBearing()
+	{
+		return 0;
+	}
+	
+	// Draw the StationaryPointOverlay to the MapView at the location
 	// given with the attributes defined
 	@Override protected void draw(final Canvas canvas, final MapView mapView, final boolean shadow)
 	{
-		//TODO: Before drawing, make sure the StationaryPointOverlay has a location
+		// Before drawing, make sure the StationaryPointOverlay has a location
 		if (pLocation!=null)
 		{
-			//TODO: For the pre-shadow draw
+			// For the pre-shadow draw
 			if (!shadow)
 			{
 				final Projection proj = mapView.getProjection();
 				proj.toMapPixels(pLocation, screenCoords);
 				
-				//TODO: Draw the circle with the color and radius defined
+				// Draw the circle with the color and radius defined
 				canvas.drawCircle(screenCoords.x, screenCoords.y, radius, pPaint);
 			}
-			//TODO: For the shadow draw
+			// For the shadow draw
 			else
 			{
 				// Do nothing
