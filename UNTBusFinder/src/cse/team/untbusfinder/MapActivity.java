@@ -122,6 +122,14 @@ public class MapActivity extends Activity
 		
 		// Adjust the action bar for this activity
 		setupActionBar();
+		
+		// Display a path from Discovery Park to UNT (temporary implementation
+		// until we start getting this from the server)
+		PathOverlay discoveryParkPath = busPathOverlayStyle;
+		discoveryParkPath.setColor(Color.parseColor("#009933"));
+		discoveryParkPath.addPoint(new GeoPoint(33.253977, -97.151756));
+		discoveryParkPath.addPoint(new GeoPoint(33.211635, -97.147468));
+		busPathOverlays.add(discoveryParkPath);
 	}
 	
 	// Start and/or resume polling for location
