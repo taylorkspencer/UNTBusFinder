@@ -17,6 +17,13 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.os.Handler;
 
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.client.HttpClient;
+
+import org.json.JSONObject;
+
 public class LocationCommunicator extends Service implements Runnable
 {
 	// Variables declared here so that they can be accessed in the LocationListener
@@ -24,6 +31,9 @@ public class LocationCommunicator extends Service implements Runnable
 	boolean isPolling = false;
 	
 	Handler locationQueryTimer;
+	HttpParams locServerParams;
+	HttpClient locServerClient;
+	
 	
 	// An ArrayList of LocationListeners is declared here so that other classes
 	// can listen for location updates
@@ -36,7 +46,7 @@ public class LocationCommunicator extends Service implements Runnable
 	public LocationCommunicator(String serverURL)
 	{
 		//TODO: Initialize the locationQueryTimer
-		locationQueryTimer = new Handler(this);
+		locationQueryTimer = new Handler();
 	}
 	
 	//TODO: Start polling the server for location updates
@@ -44,7 +54,9 @@ public class LocationCommunicator extends Service implements Runnable
 	{
 		try
 		{
-			
+			//TODO: Query the server for location updates and if one is received,
+			// send the new location to any listeners
+			locationQueryTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES);
 			
 			// If all this is successful, set isPolling to true to indicate that
 			// polling for location has begun
@@ -61,7 +73,8 @@ public class LocationCommunicator extends Service implements Runnable
 	{
 		try
 		{
-			
+			//TODO: Stop querying the server for location updates
+			locationQueryTimer.removeCallbacks(this);
 			
 			// If all this is successful, set isPolling to false to indicate that
 			// polling for location has stopped
@@ -81,11 +94,39 @@ public class LocationCommunicator extends Service implements Runnable
 	
 	@Override public void run()
 	{
-		// Notify any listening threads about the location change
-		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
+		//TODO: Attempt to connect to the server
+		try
 		{
-			listeners.get(lIndex).onLocationChanged(location);
+			
 		}
+		//TODO: If the connection failed, exit the function
+		catch ()
+		{
+			
+		}
+		//TODO: Query the server for location updates
+		
+		//TODO: Parse the JSON returned by the server
+		try
+		{
+			
+		}
+		//TODO: If the JSON is invalid, disconnect and exit the function
+		catch ()
+		{
+			
+		}
+		//TODO: If a location is changed by MIN_DISTANCE_CHANGE_FOR_UPDATES or more
+		if ()
+		{
+			// Notify any listening threads about the location change
+			for (int lIndex=0; listeners.size()>lIndex; lIndex++)
+			{
+				listeners.get(lIndex).onLocationChanged(location);
+			}
+		}
+		// Renew the locationQueryTimer
+		locationQueryTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES);
 	}
 	
 	@Override public IBinder onBind(Intent intent)
