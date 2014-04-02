@@ -1,6 +1,7 @@
 package cse.team.untbusfinder;
 
 import java.util.ArrayList;
+import java.lang.Runnable;
 
 import android.app.AlertDialog;
 import android.app.Service;
@@ -14,15 +15,15 @@ import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.os.Handler;
 
-public class LocationCommunicator extends Service implements LocationListener
+public class LocationCommunicator extends Service implements Runnable
 {
 	// Variables declared here so that they can be accessed in the LocationListener
 	boolean isNetworkEnabled = false;
 	boolean isPolling = false;
 	
-	protected LocationManager locMgr;
-	Location lastLocation;
+	Handler locationQueryTimer;
 	
 	// An ArrayList of LocationListeners is declared here so that other classes
 	// can listen for location updates
@@ -32,9 +33,10 @@ public class LocationCommunicator extends Service implements LocationListener
 	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
 	private static final long MIN_TIME_BTWN_UPDATES = 1000*10; // In milliseconds (10s interval)
 	
-	public LocationCommunicator()
+	public LocationCommunicator(String serverURL)
 	{
-		
+		//TODO: Initialize the locationQueryTimer
+		locationQueryTimer = new Handler(this);
 	}
 	
 	//TODO: Start polling the server for location updates
@@ -77,39 +79,12 @@ public class LocationCommunicator extends Service implements LocationListener
 		return isPolling;
 	}
 	
-	@Override public void onLocationChanged(Location location)
+	@Override public void run()
 	{
 		// Notify any listening threads about the location change
 		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
 		{
 			listeners.get(lIndex).onLocationChanged(location);
-		}
-	}
-	
-	@Override public void onProviderDisabled(String provider)
-	{
-		// Notify any listening threads about the provider change
-		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
-		{
-			listeners.get(lIndex).onProviderDisabled(provider);
-		}
-	}
-	
-	@Override public void onProviderEnabled(String provider)
-	{
-		// Notify any listening threads about the provider change
-		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
-		{
-			listeners.get(lIndex).onProviderEnabled(provider);
-		}
-	}
-	
-	@Override public void onStatusChanged(String provider, int status, Bundle extras)
-	{
-		// Notify any listening threads about the status change
-		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
-		{
-			listeners.get(lIndex).onStatusChanged(provider, status, extras);
 		}
 	}
 	
