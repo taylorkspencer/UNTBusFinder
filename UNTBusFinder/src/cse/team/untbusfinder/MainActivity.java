@@ -17,8 +17,21 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);		
 		
+		//TODO: Start the GPSretrieve and LocationCommunicator services
+		Intent gpsServInt = new Intent(this, GPSretrieve.class);
+		Intent locComInt = new Intent(this, LocationCommunicator.class);
+		startService(gpsServInt);
+		startService(locComInt);
+		
 		// Adjust the action bar for this activity
 		setupActionBar();
+	}
+	
+	// Stub - where we will need to initialize any instances of GPSretrieve
+	// or LocationCommunicator in this Activity (should we need to)
+	@Override protected void onStart()
+	{
+		super.onStart();
 	}
 	
 	// Start and/or resume polling for location

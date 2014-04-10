@@ -29,6 +29,8 @@
 				<category android:name="android.intent.category.DEFAULT"/>
 			</intent-filter>
 		</activity>
+		<service android:name=".GPSretrieve"/>
+		<service android:name=".LocationCommunicator"/>
 	</application>
 	
 	<uses-permission android:name="android.permission.INTERNET"/>

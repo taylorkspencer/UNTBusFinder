@@ -37,8 +37,8 @@ public class MapActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
 		
-		// Register the GPSretrieve class object
-		gps = new GPSretrieve(getApplicationContext());
+		//TODO: Retrieve the GPSretrieve service
+		gps = GPSretrieve.getInstance();
 		
 		// Set up the OpenStreetMaps view
 		mapView = (MapView)findViewById(R.id.generalMap);

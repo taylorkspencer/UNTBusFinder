@@ -18,7 +18,6 @@ import android.provider.Settings;
 public class GPSretrieve extends Service implements LocationListener
 {
 	// Variables declared here so that they can be accessed in the LocationListener
-	private final Context mContext;
 	boolean isGPSEnabled = false;
 	boolean isNetworkEnabled = false;
 	boolean canGetLocation = false;
@@ -31,15 +30,28 @@ public class GPSretrieve extends Service implements LocationListener
 	// can listen for location updates
 	ArrayList<LocationListener> listeners = new ArrayList<LocationListener>();
 	
+	//TODO: Static instance of this Service (so Activities can access it)
+	static GPSretrieve sInstance;
+	
 	// Constants
 	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
 	private static final long MIN_TIME_BTWN_UPDATES = 1000*10; // In milliseconds (10s currently)
-		
-	public GPSretrieve(Context context)
+	
+	@Override public void onCreate()
 	{
-		// Store the context and the LocationManager from the system
-		mContext = context;
-		locMgr = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
+		super.onCreate();
+		
+		// Store the LocationManager from the system
+		locMgr = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		
+		//TODO: Store a static instance of this Service in sInstance
+		sInstance = this;
+	}
+	
+	//TODO: Return a static instance of this Service for Activities
+	static public GPSretrieve getInstance()
+	{
+		return sInstance;
 	}
 	
 	// Start polling for location updates
@@ -149,7 +161,7 @@ public class GPSretrieve extends Service implements LocationListener
 	// startPolling() and stopPolling() so we turn off all the providers
 	public void showSettingsAlert()
 	{
-		AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 		
 		alertDialog.setTitle("GPS in settings");
 		
@@ -160,7 +172,7 @@ public class GPSretrieve extends Service implements LocationListener
 			public void onClick(DialogInterface dialog, int which)
 			{
 				Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-				mContext.startActivity(intent);
+				startActivity(intent);
 			}
 		});
 		

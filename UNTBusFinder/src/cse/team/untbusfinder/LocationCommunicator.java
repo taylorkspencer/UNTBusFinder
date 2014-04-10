@@ -21,7 +21,6 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.client.HttpClient;
-
 import org.json.JSONObject;
 
 public class LocationCommunicator extends Service implements Runnable
@@ -34,6 +33,8 @@ public class LocationCommunicator extends Service implements Runnable
 	HttpParams locServerParams;
 	HttpClient locServerClient;
 	
+	//TODO: Static instance of this Service (so Activities can access it)
+	static LocationCommunicator sInstance;
 	
 	// An ArrayList of LocationListeners is declared here so that other classes
 	// can listen for location updates
@@ -43,14 +44,25 @@ public class LocationCommunicator extends Service implements Runnable
 	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
 	private static final long MIN_TIME_BTWN_UPDATES = 1000*10; // In milliseconds (10s interval)
 	
-	public LocationCommunicator(String serverURL)
+	@Override public void onCreate()
 	{
+		super.onCreate();
+		
 		//TODO: Initialize the locationQueryTimer
 		locationQueryTimer = new Handler();
+		
+		//TODO: Store a static instance of this Service in sInstance
+		sInstance = this;
+	}
+	
+	//TODO: Return a static instance of this Service for Activities
+	static public LocationCommunicator getInstance()
+	{
+		return sInstance;
 	}
 	
 	//TODO: Start polling the server for location updates
-	public void startPolling()
+	public void startPolling(String serverURL)
 	{
 		try
 		{
@@ -94,6 +106,7 @@ public class LocationCommunicator extends Service implements Runnable
 	
 	@Override public void run()
 	{
+		/* Temporarily commented out so that we can compile
 		//TODO: Attempt to connect to the server
 		try
 		{
@@ -126,7 +139,7 @@ public class LocationCommunicator extends Service implements Runnable
 			}
 		}
 		// Renew the locationQueryTimer
-		locationQueryTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES);
+		locationQueryTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES);*/
 	}
 	
 	@Override public IBinder onBind(Intent intent)
