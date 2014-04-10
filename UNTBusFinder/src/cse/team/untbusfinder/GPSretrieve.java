@@ -30,7 +30,7 @@ public class GPSretrieve extends Service implements LocationListener
 	// can listen for location updates
 	ArrayList<LocationListener> listeners = new ArrayList<LocationListener>();
 	
-	//TODO: Static instance of this Service (so Activities can access it)
+	// Static instance of this Service (so Activities can access it)
 	static GPSretrieve sInstance;
 	
 	// Constants
@@ -44,11 +44,11 @@ public class GPSretrieve extends Service implements LocationListener
 		// Store the LocationManager from the system
 		locMgr = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		
-		//TODO: Store a static instance of this Service in sInstance
+		// Store a static instance of this Service in sInstance
 		sInstance = this;
 	}
 	
-	//TODO: Return a static instance of this Service for Activities
+	// Return a static instance of this Service for Activities
 	static public GPSretrieve getInstance()
 	{
 		return sInstance;

@@ -17,7 +17,7 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);		
 		
-		//TODO: Start the GPSretrieve and LocationCommunicator services
+		// Start the GPSretrieve and LocationCommunicator services
 		Intent gpsServInt = new Intent(this, GPSretrieve.class);
 		Intent locComInt = new Intent(this, LocationCommunicator.class);
 		startService(gpsServInt);
