@@ -8,6 +8,9 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayManager;
 import org.osmdroid.views.overlay.PathOverlay;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 
 import android.app.Activity;
 import android.app.ActionBar;
@@ -20,9 +23,11 @@ import android.view.View;
 
 public class MapActivity extends Activity
 {
-	// Variables declared here so that they can be accessed in the LocationListener
+	// Variables declared here so that they can be accessed in the LocationListeners
+	// and MapListener
 	MapView mapView;
 	GPSretrieve gps;
+	LocationCommunicator link;
 	PointOverlay myLocOverlay;
 	List<StationaryPointOverlay> busStopOverlays;
 	StationaryPointOverlay busStopOverlayStyle;
@@ -31,20 +36,26 @@ public class MapActivity extends Activity
 	List<PathOverlay> busPathOverlays;
 	PathOverlay busPathOverlayStyle;
 	
+	boolean centerOnMyLocation, isSendingLocation = false;
+	
 	// Display the activity and register the controls
 	@Override protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
 		
-		// Retrieve the GPSretrieve service
+		// Retrieve the GPSretrieve and LocationCommunicator services
 		gps = GPSretrieve.getInstance();
+		link = LocationCommunicator.getInstance();
 		
 		// Set up the OpenStreetMaps view
 		mapView = (MapView)findViewById(R.id.generalMap);
 		mapView.setBuiltInZoomControls(true);
 		// Set the initial zoom level
 		mapView.getController().setZoom(15);
+		
+		//TODO: Set the URL of the server to be queried by the LocationCommunicator
+		link.setServerURL("http://untbusfinder.no-ip.org/");
 		
 		// Set up the overlays
 		busPathOverlayStyle = new PathOverlay(Color.TRANSPARENT, mapView.getContext());
@@ -68,8 +79,8 @@ public class MapActivity extends Activity
 			mapView.getController().setCenter(new GeoPoint(gps.getLocation()));
 		}
 		
-		// Listen for a location update and if one is received, change the map
-		// control to that location
+		// Listen for a location update from GPSretrieve and if one is received,
+		// change the map control to that location
 		gps.requestLocationUpdates(new LocationListener()
 		{
 			@Override public void onLocationChanged(Location location)
@@ -77,13 +88,21 @@ public class MapActivity extends Activity
 				// Make sure the new location isn't null
 				if (location!=null)
 				{
-					// Center the map on the changed location
-					mapView.getController().setCenter(new GeoPoint(location));
+					// If the user has not moved the focus, center the map on the changed location
+					if (centerOnMyLocation)
+					{
+						mapView.getController().setCenter(new GeoPoint(location));
+						
+						//TODO: Since changing the center of the map will set centerOnMyLocation to
+						// false, 
+						centerOnMyLocation = true;
+					}
 					
 					//TODO: If there was a previous location, declare a MotionPointOverlay
 					// and set its point in the direction of the change
 					if ((gps.getLastLocation()!=null)&&(gps.hasBearing()))
 					{
+						// Declare the myLocOverlay as a MotionPointOverlay
 						myLocOverlay = new MotionPointOverlay(mapView.getContext());
 						
 						//TODO: Determine the direction of the change (this needs to be further tested)
@@ -91,6 +110,7 @@ public class MapActivity extends Activity
 					}
 					else
 					{
+						// Declare the myLocOverlay as a StationaryPointOverlay
 						myLocOverlay = new StationaryPointOverlay(mapView.getContext());
 					}
 					// Set the shared default attributes of the point
@@ -98,6 +118,75 @@ public class MapActivity extends Activity
 					
 					// Update the myLocOverlay to the changed location
 					myLocOverlay.setLocation(new GeoPoint(location));
+					
+					// Remove the old overlays and replace them with the new ones
+					reloadOverlays();
+				}
+			}
+			
+			@Override public void onProviderDisabled(String provider)
+			{
+				// Do nothing - we don't care about this change
+			}
+			
+			@Override public void onProviderEnabled(String provider)
+			{
+				// Do nothing - we don't care about this change
+			}
+			
+			@Override public void onStatusChanged(String provider, int status, Bundle bundle)
+			{
+				// Do nothing - we don't care about this change
+			}
+		});
+		
+		//TODO: Listen for a location update from LocationCommunicator and if one is
+		// received, change the map control to that location
+		link.requestLocationUpdates(new LocationListener()
+		{
+			@Override public void onLocationChanged(Location location)
+			{
+				// Make sure the new location isn't null
+				if (location!=null)
+				{
+					PointOverlay busLocOverlay;
+					//TODO: If there was a previous location, remove the previous
+					// location from the array, declare a MotionPointOverlay,
+					// and set its point in the direction of the change
+					if (link.getLastLocation()!=null)
+					{
+						//TODO: Look through the busLocOverlays list for a PointOverlay
+						// with the same location as the last location
+						for (int point=0, pntFound=0; ((point<busLocOverlays.size())&&(pntFound==0)); point++)
+						{
+							//TODO: If the location of this point is equal to the last location, remove
+							// it and exit the loop
+							if (busLocOverlays.get(point).getLocation().equals(link.getLastLocation()))
+							{
+								busLocOverlays.remove(location);
+								pntFound = 1;
+							}
+						}
+						
+						// Declare the busLocOverlay as a MotionPointOverlay
+						busLocOverlay = new MotionPointOverlay(mapView.getContext());
+						
+						//TODO: Determine the direction of the change (this needs to be further tested)
+						busLocOverlay.setBearing(location.getBearing());
+					}
+					else
+					{
+						// Declare the busLocOverlay as a StationaryPointOverlay
+						busLocOverlay = new StationaryPointOverlay(mapView.getContext());
+					}
+					// Set the shared default attributes of the point
+					busLocOverlay = setBusLocOverlayAttributes(busLocOverlay);
+					
+					// Set the location of the busLocOverlay to the changed location
+					busLocOverlay.setLocation(new GeoPoint(location));
+					
+					// Add the point to the busLocOverlays array
+					busLocOverlays.add(busLocOverlay);
 					
 					// Remove the old overlays and replace them with the new ones
 					reloadOverlays();
@@ -130,13 +219,40 @@ public class MapActivity extends Activity
 		discoveryParkPath.addPoint(new GeoPoint(33.253977, -97.151756));
 		discoveryParkPath.addPoint(new GeoPoint(33.211635, -97.147468));
 		busPathOverlays.add(discoveryParkPath);
+		
+		//TODO: Listen for events from the MapView to turn off centering of the map
+		// on the user's location when the user changes the focus
+		mapView.setMapListener(new MapListener()
+		{
+			@Override public boolean onScroll(ScrollEvent event)
+			{
+				// Turn off centering on the user's location
+				centerOnMyLocation = false;
+				return true;
+			}
+			
+			@Override public boolean onZoom(ZoomEvent event)
+			{
+				// Do nothing - we don't care about this change
+				return true;
+			}
+		});
+		
+		//TODO: Have the map center on the user's location until the user changes the focus
+		centerOnMyLocation = true;
 	}
 	
 	// Start and/or resume polling for location
 	@Override protected void onResume()
 	{
-		// Begin polling for location
-		gps.startPolling();
+		//TODO: Determine if the location is being sent to the server
+		if (!isSendingLocation)
+		{
+			// Begin polling for location from GPSretrieve
+			gps.startPolling();
+		}
+		// Begin polling for location from LocationCommunicator
+		link.startPolling();
 		
 		super.onResume();
 	}
@@ -230,8 +346,14 @@ public class MapActivity extends Activity
 	// when UNT Bus Finder closes
 	@Override protected void onPause()
 	{
-		// Stop polling for location
-		gps.stopPolling();
+		//TODO: Determine if the location is being sent to the server
+		if (!isSendingLocation)
+		{
+			// Stop polling for location from GPSretrieve
+			gps.stopPolling();
+		}
+		// Stop polling for location from LocationCommunicator
+		link.stopPolling();
 		super.onPause();
 	}
 }

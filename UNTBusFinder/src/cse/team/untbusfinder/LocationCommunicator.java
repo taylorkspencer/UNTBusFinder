@@ -146,6 +146,29 @@ public class LocationCommunicator extends Service implements Runnable
 		return isPolling;
 	}
 	
+	// Return the last location, or null if there isn't any
+	// Used for comparing locations
+	//TODO: This method will need to be changed once we start getting multiple
+	// locations
+	public GeoPoint getLastLocation()
+	{
+		return location;
+	}
+	
+	// Return the most recent location available
+	//TODO: This method will need to be changed once we start getting multiple
+	// locations
+	public GeoPoint getLocation()
+	{
+		// If location is null, return null (We aren't going to do requests on
+		// demand because we don't want to over-stress the server)
+		if (location==null)
+		{
+			return null;
+		}
+		return location;
+	}
+	
 	@Override public void run()
 	{
 		//TODO: Attempt to connect to the server
@@ -225,6 +248,7 @@ public class LocationCommunicator extends Service implements Runnable
 				Location toSend = new Location("LocationCommunicator");
 				toSend.setLatitude(newLocation.getLatitude());
 				toSend.setLongitude(newLocation.getLongitude());
+				toSend.setBearing((float)newLocation.bearingTo(location));
 				
 				// Notify any listening threads about the location change
 				for (int lIndex=0; listeners.size()>lIndex; lIndex++)
