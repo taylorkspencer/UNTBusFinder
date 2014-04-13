@@ -1,22 +1,17 @@
 package cse.team.untbusfinder;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.Runnable;
 
-import android.app.AlertDialog;
 import android.app.Service;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
-import android.location.LocationProvider;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.os.Handler;
 
 import org.apache.http.params.HttpParams;
@@ -31,10 +26,15 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
+
 import org.json.JSONObject;
 import org.json.JSONException;
+
 import org.osmdroid.util.GeoPoint;
 
 public class LocationCommunicator extends Service implements Runnable
@@ -169,6 +169,46 @@ public class LocationCommunicator extends Service implements Runnable
 		return location;
 	}
 	
+	//TODO: Send a location to the server
+	// Returns true if sending location was successful, sends false if not
+	//TODO: Send bus route along with location
+	public boolean sendLocation(GeoPoint sendingLoc)
+	{
+		//TODO: Create a HttpPost request containing the latitude and longitude from the location
+		HttpPost sendingLocPost = new HttpPost();
+		List<NameValuePair> locPair = new ArrayList<NameValuePair>(2);
+		locPair.add(new BasicNameValuePair("lat", Double.toString(sendingLoc.getLatitude())));
+		locPair.add(new BasicNameValuePair("long", Double.toString(sendingLoc.getLongitude())));
+		try
+		{
+			sendingLocPost.setEntity(new UrlEncodedFormEntity(locPair));
+		}
+		//TODO: If the syntax could not be encoded, return false to indicate a failure
+		catch (UnsupportedEncodingException badSyntax)
+		{
+			return false;
+		}
+		
+		//TODO: Send the location to the server as a POST request
+		HttpResponse locServerResponse;
+		try
+		{
+			locServerResponse = locServerClient.execute(sendingLocPost);
+		}
+		//TODO: If the server is not a HTTP server, return false to indicate a failure
+		catch (ClientProtocolException notHTTPserver)
+		{
+			return false;
+		}
+		//TODO: If the connection could not be established, return false to indicate a failure
+		catch (IOException serverConnectionError)
+		{
+			return false;
+		}
+		//TODO: If all this is successful, return true
+		return true;
+	}
+	
 	@Override public void run()
 	{
 		//TODO: Attempt to connect to the server
@@ -183,9 +223,6 @@ public class LocationCommunicator extends Service implements Runnable
 			return;
 		}
 		//TODO: Query the server for location updates
-		
-		
-		//TODO: Send the query to the server
 		HttpResponse locServerResponse = null;
 		try
 		{
@@ -224,6 +261,12 @@ public class LocationCommunicator extends Service implements Runnable
 			}
 			//TODO: If the JSON is invalid, stop polling and exit the function
 			catch (IOException JSONioException)
+			{
+				stopPolling();
+				return;
+			}
+			//TODO: If the server didn't return any JSON, stop polling and exit the function
+			catch (NullPointerException JSONnullException)
 			{
 				stopPolling();
 				return;
