@@ -62,7 +62,7 @@ public class MapActivity extends Activity
 		// Set the initial zoom level
 		mapView.getController().setZoom(15);
 		
-		//TODO: Set the URL of the server to be queried by the LocationCommunicator
+		// Set the URL of the server to be queried by the LocationCommunicator
 		link.setServerURL("http://untbusfinder.no-ip.org/");
 		
 		// Set up the overlays
@@ -104,7 +104,7 @@ public class MapActivity extends Activity
 					{
 						mapView.getController().setCenter(new GeoPoint(location));
 						
-						//TODO: Since changing the center of the map will set centerOnMyLocation to
+						// Since changing the center of the map will set centerOnMyLocation to
 						// false, 
 						centerOnMyLocation = true;
 					}
@@ -231,7 +231,7 @@ public class MapActivity extends Activity
 		discoveryParkPath.addPoint(new GeoPoint(33.211635, -97.147468));
 		busPathOverlays.add(discoveryParkPath);
 		
-		//TODO: Listen for events from the MapView to turn off centering of the map
+		// Listen for events from the MapView to turn off centering of the map
 		// on the user's location when the user changes the focus
 		mapView.setMapListener(new MapListener()
 		{
@@ -249,14 +249,14 @@ public class MapActivity extends Activity
 			}
 		});
 		
-		//TODO: Have the map center on the user's location until the user changes the focus
+		// Have the map center on the user's location until the user changes the focus
 		centerOnMyLocation = true;
 	}
 	
 	// Start and/or resume polling for location
 	@Override protected void onResume()
 	{
-		//TODO: Determine if the location is being sent to the server
+		// Determine if the location is being sent to the server
 		if (!isSendingLocation)
 		{
 			// Begin polling for location from GPSretrieve
@@ -322,10 +322,10 @@ public class MapActivity extends Activity
 		mapView.getOverlays().add(myLocOverlay);
 	}
 	
-	//TODO: Start sending locations to the server
+	// Start sending locations to the server
 	public void startSendingLocation()
 	{
-		//TODO: Query the server for location updates and if one is received,
+		// Query the server for location updates and if one is received,
 		// send the new location to any listeners
 		locUpdTimer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MIN_TIME_BTWN_UPDATES);
 		
@@ -334,10 +334,10 @@ public class MapActivity extends Activity
 		isSendingLocation = true;
 	}
 	
-	//TODO: Stop sending locations to the server
+	// Stop sending locations to the server
 	public void stopSendingLocation()
 	{
-		//TODO: Stop sending the location to the server
+		// Stop sending the location to the server
 		locUpdTimer.cancel(true);
 		
 		// Set isSendingLocation to false to indicate that sending location has stopped
@@ -372,43 +372,61 @@ public class MapActivity extends Activity
 	{
 		// Inflate the menu; this adds items to the action bar if it is present
 		getMenuInflater().inflate(R.menu.map, menu);
+		
+		// If the user is not sending location, set the toggle text to
+		// Send My Location
+		if (!isSendingLocation)
+		{
+			menu.findItem(R.id.toggle_send_location).setTitle(R.string.action_send_my_location);
+		}
+		// If the user is sending location, set the toggle text to Stop
+		// Sending My Location
+		else
+		{
+			menu.findItem(R.id.toggle_send_location).setTitle(R.string.action_stop_sending_my_location);
+		}
 		return true;
 	}
 	
 	@Override public boolean onOptionsItemSelected(MenuItem item)
 	{
-		//TODO: Determine if the user chose Send My Location
-		if (item.getItemId()==R.id.send_my_location)
+		// Determine if the user chose the Send My Location toggle item
+		if (item.getItemId()==R.id.toggle_send_location)
 		{
-			//TODO: If the menu item is checked, start sending location
-			if (!item.isChecked())
+			// If the user is not sending location, start sending location
+			if (!isSendingLocation)
 			{
-				//TODO: Turn on location sending
+				// Turn on location sending
 				startSendingLocation();
 				
-				//TODO: If location sending was successfully turned on, check
-				// Send My Location
-				item.setChecked(true);
+				// If location sending was successfully turned on, change
+				// the toggle text to Stop Sending My Location
+				item.setTitle(R.string.action_stop_sending_my_location);
 			}
-			//TODO: If the menu item is not checked, stop sending location
+			// If the user is sending location, stop sending location
 			else
 			{
-				//TODO: Turn off location sending
+				// Turn off location sending
 				stopSendingLocation();
 				
-				//TODO: If location sending was successfully turned off, uncheck
-				// Send My Location
-				item.setChecked(false);
+				// If location sending was successfully turned off, change
+				// the toggle text to Send My Location
+				item.setTitle(R.string.action_send_my_location);
 			}
+			return true;
 		}
-		return true;
+		// For other items, return false
+		else
+		{
+			return false;
+		}
 	}
 	
 	// If the location is not being sent to the server, stop polling for location
 	// when UNT Bus Finder closes
 	@Override protected void onPause()
 	{
-		//TODO: Determine if the location is being sent to the server
+		// Determine if the location is being sent to the server
 		if (!isSendingLocation)
 		{
 			// Stop polling for location from GPSretrieve
@@ -421,10 +439,10 @@ public class MapActivity extends Activity
 	
 	class LocationSendingTimer extends AsyncTask<Long, Void, Long>
 	{
-		//TODO: Send the user's location to the server
+		// Send the user's location to the server
 		@Override protected Long doInBackground(Long... interval)
 		{
-			//TODO: Wait for the timer interval to pass
+			// Wait for the timer interval to pass
 			try
 			{
 				Thread.sleep(interval[0]);
@@ -435,12 +453,12 @@ public class MapActivity extends Activity
 			}
 			finally
 			{
-				//TODO: If sending the location was successful, renew the locationSenderTimer
+				// If sending the location was successful, renew the locationSenderTimer
 				if (link.sendLocation(new GeoPoint(gps.getLocation())))
 				{
 					locUpdTimer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MIN_TIME_BTWN_UPDATES);
 				}
-				//TODO: If not, stop sending location to the server
+				// If not, stop sending location to the server
 				else
 				{
 					stopSendingLocation();

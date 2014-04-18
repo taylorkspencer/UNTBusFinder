@@ -5,4 +5,5 @@
 	<string name="map">Map</string>
 	<string name="routes">Discovery Park</string>
 	<string name="action_send_my_location">Send My Location</string>
+	<string name="action_stop_sending_my_location">Stop Sending My Location</string>
 </resources>
