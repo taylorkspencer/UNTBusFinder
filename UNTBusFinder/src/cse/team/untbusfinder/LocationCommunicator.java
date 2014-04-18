@@ -169,13 +169,13 @@ public class LocationCommunicator extends Service implements Runnable
 		return location;
 	}
 	
-	//TODO: Send a location to the server
+	// Send a location to the server
 	// Returns true if sending location was successful, sends false if not
 	//TODO: Send bus route along with location
 	public boolean sendLocation(GeoPoint sendingLoc)
 	{
 		//TODO: Create a HttpPost request containing the latitude and longitude from the location
-		HttpPost sendingLocPost = new HttpPost();
+		HttpPost sendingLocPost = new HttpPost(serverURL);
 		List<NameValuePair> locPair = new ArrayList<NameValuePair>(2);
 		locPair.add(new BasicNameValuePair("lat", Double.toString(sendingLoc.getLatitude())));
 		locPair.add(new BasicNameValuePair("long", Double.toString(sendingLoc.getLongitude())));
@@ -209,6 +209,7 @@ public class LocationCommunicator extends Service implements Runnable
 		return true;
 	}
 	
+	//TODO: Get locations from the server
 	@Override public void run()
 	{
 		//TODO: Attempt to connect to the server

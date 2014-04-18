@@ -18,7 +18,9 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.os.AsyncTask;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 public class MapActivity extends Activity
@@ -35,8 +37,14 @@ public class MapActivity extends Activity
 	PointOverlay busLocOverlayStyle;
 	List<PathOverlay> busPathOverlays;
 	PathOverlay busPathOverlayStyle;
+	LocationSendingTimer locUpdTimer;
 	
 	boolean centerOnMyLocation, isSendingLocation = false;
+	
+	// Constants
+	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+	private static final long MIN_TIME_BTWN_UPDATES = 1000*10; // In milliseconds (10s interval)
+	private static final int MAX_TIME_TO_WAIT = 1000*10; // In milliseconds (10 seconds)
 	
 	// Display the activity and register the controls
 	@Override protected void onCreate(Bundle savedInstanceState)
@@ -65,6 +73,9 @@ public class MapActivity extends Activity
 		busPathOverlays = new ArrayList<PathOverlay>();
 		busStopOverlays = new ArrayList<StationaryPointOverlay>();
 		busLocOverlays = new ArrayList<PointOverlay>();
+		
+		// Initialize the LocationSendingTimer
+		locUpdTimer = new LocationSendingTimer();
 	}
 	
 	// Set the initial locations of the MapView and its Overlays
@@ -311,6 +322,28 @@ public class MapActivity extends Activity
 		mapView.getOverlays().add(myLocOverlay);
 	}
 	
+	//TODO: Start sending locations to the server
+	public void startSendingLocation()
+	{
+		//TODO: Query the server for location updates and if one is received,
+		// send the new location to any listeners
+		locUpdTimer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MIN_TIME_BTWN_UPDATES);
+		
+		// If all this is successful, set isSendingLocation to true to 
+		// indicate that sending location has begun
+		isSendingLocation = true;
+	}
+	
+	//TODO: Stop sending locations to the server
+	public void stopSendingLocation()
+	{
+		//TODO: Stop sending the location to the server
+		locUpdTimer.cancel(true);
+		
+		// Set isSendingLocation to false to indicate that sending location has stopped
+		isSendingLocation = false;
+	}
+	
 	// Go to the previous activity, or if this is the first activity, hide
 	@Override public void onBackPressed()
 	{
@@ -337,8 +370,37 @@ public class MapActivity extends Activity
 	
 	@Override public boolean onCreateOptionsMenu(Menu menu)
 	{
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		// Inflate the menu; this adds items to the action bar if it is present
+		getMenuInflater().inflate(R.menu.map, menu);
+		return true;
+	}
+	
+	@Override public boolean onOptionsItemSelected(MenuItem item)
+	{
+		//TODO: Determine if the user chose Send My Location
+		if (item.getItemId()==R.id.send_my_location)
+		{
+			//TODO: If the menu item is checked, start sending location
+			if (!item.isChecked())
+			{
+				//TODO: Turn on location sending
+				startSendingLocation();
+				
+				//TODO: If location sending was successfully turned on, check
+				// Send My Location
+				item.setChecked(true);
+			}
+			//TODO: If the menu item is not checked, stop sending location
+			else
+			{
+				//TODO: Turn off location sending
+				stopSendingLocation();
+				
+				//TODO: If location sending was successfully turned off, uncheck
+				// Send My Location
+				item.setChecked(false);
+			}
+		}
 		return true;
 	}
 	
@@ -355,5 +417,36 @@ public class MapActivity extends Activity
 		// Stop polling for location from LocationCommunicator
 		link.stopPolling();
 		super.onPause();
+	}
+	
+	class LocationSendingTimer extends AsyncTask<Long, Void, Long>
+	{
+		//TODO: Send the user's location to the server
+		@Override protected Long doInBackground(Long... interval)
+		{
+			//TODO: Wait for the timer interval to pass
+			try
+			{
+				Thread.sleep(interval[0]);
+			}
+			catch (InterruptedException cancelled)
+			{
+				// This means location sending is being cancelled - do nothing
+			}
+			finally
+			{
+				//TODO: If sending the location was successful, renew the locationSenderTimer
+				if (link.sendLocation(new GeoPoint(gps.getLocation())))
+				{
+					locUpdTimer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MIN_TIME_BTWN_UPDATES);
+				}
+				//TODO: If not, stop sending location to the server
+				else
+				{
+					stopSendingLocation();
+				}
+			}
+			return interval[0];
+		}
 	}
 }
