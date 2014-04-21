@@ -223,13 +223,13 @@ public class MapActivity extends Activity
 		// Adjust the action bar for this activity
 		setupActionBar();
 		
-		// Display a path from Discovery Park to UNT (temporary implementation
+		//TODO: Display the path for the Discovery Park route (temporary implementation
 		// until we start getting this from the server)
-		PathOverlay discoveryParkPath = busPathOverlayStyle;
-		discoveryParkPath.setColor(Color.parseColor("#009933"));
-		discoveryParkPath.addPoint(new GeoPoint(33.253977, -97.151756));
-		discoveryParkPath.addPoint(new GeoPoint(33.211635, -97.147468));
-		busPathOverlays.add(discoveryParkPath);
+		addDiscParkBusRoute();
+		
+		//TODO: Add the bus stops for the Discovery Park route (temporary implementation
+		// until we start getting this from the server)
+		addDiscParkBusRouteStops();
 		
 		// Listen for events from the MapView to turn off centering of the map
 		// on the user's location when the user changes the focus
@@ -282,6 +282,91 @@ public class MapActivity extends Activity
 			// If not, disable the up option
 			getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
 		}
+	}
+	//TODO: Display the path for the Discovery Park route (temporary implementation
+	// until we start getting this from the server)
+	protected void addDiscParkBusRoute()
+	{
+		PathOverlay discoveryParkRoutePath = busPathOverlayStyle;
+		discoveryParkRoutePath.setColor(Color.parseColor("#009933"));
+		
+		//TODO: From Discovery Park to UNT main campus
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25352, -97.15418));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25267, -97.15481));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25105, -97.15173));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25107, -97.15104));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25143, -97.15036));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25343, -97.14891));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25367, -97.14884));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25452, -97.15052));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25387, -97.15100));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25292, -97.14923));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25143, -97.15036));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25107, -97.15104));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25105, -97.15173));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25110, -97.15185));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25066, -97.15208));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25483, -97.16008));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25437, -97.16039));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25367, -97.16032));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.22065, -97.16130));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.22027, -97.16145));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21973, -97.16191));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21937, -97.16202));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21632, -97.16136));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21473, -97.16139));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21475, -97.15503));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21152, -97.15507));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21150, -97.15366));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21156, -97.15317));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21156, -97.15289));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21371, -97.15288));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21367, -97.14853));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21369, -97.14846));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21376, -97.14844));
+		
+		//TODO: From UNT main campus to Discovery Park
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21569, -97.14840));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21580, -97.16137));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21632, -97.16136));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21937, -97.16202));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.21973, -97.16191));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.22027, -97.16145));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.22065, -97.16130));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25367, -97.16032));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25437, -97.16039));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25471, -97.16020));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25044, -97.15207));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25105, -97.15173));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25267, -97.15481));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25288, -97.15465));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25271, -97.15428));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25333, -97.15379));
+		discoveryParkRoutePath.addPoint(new GeoPoint(33.25352, -97.15418));
+		busPathOverlays.add(discoveryParkRoutePath);
+	}
+	
+	//TODO: Add the bus stops for the Discovery Park route (temporary implementation
+	// until we start getting this from the server)
+	protected void addDiscParkBusRouteStops()
+	{
+		StationaryPointOverlay dpRouteStop1 = busStopOverlayStyle;
+		dpRouteStop1 = (StationaryPointOverlay)setBusStopOverlayAttributes(dpRouteStop1);
+		dpRouteStop1.setColor(Color.parseColor("#009933"));
+		dpRouteStop1.setLocation(new GeoPoint(33.25340, -97.15394));
+		busStopOverlays.add(dpRouteStop1);
+		
+		StationaryPointOverlay dpRouteStop2 = busStopOverlayStyle;
+		dpRouteStop2 = (StationaryPointOverlay)setBusStopOverlayAttributes(dpRouteStop2);
+		dpRouteStop2.setColor(Color.parseColor("#009933"));
+		dpRouteStop2.setLocation(new GeoPoint(33.25372, -97.15073));
+		busStopOverlays.add(dpRouteStop2);
+		
+		StationaryPointOverlay dpRouteStop3 = busStopOverlayStyle;
+		dpRouteStop3 = (StationaryPointOverlay)setBusStopOverlayAttributes(dpRouteStop3);
+		dpRouteStop3.setColor(Color.parseColor("#009933"));
+		dpRouteStop3.setLocation(new GeoPoint(33.21396, -97.14843));
+		busStopOverlays.add(dpRouteStop3);
 	}
 	
 	// Set the shared default attributes for the myLocOverlay point
