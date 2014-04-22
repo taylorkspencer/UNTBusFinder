@@ -2,6 +2,7 @@ package cse.team.untbusfinder;
 
 import java.util.ArrayList;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -35,6 +37,7 @@ public class GPSretrieve extends Service implements LocationListener
 	
 	// Constants
 	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+	private static final long MAX_TIME_BTWN_UPDATES = 1000*100; // In milliseconds (100s currently)
 	private static final long MIN_TIME_BTWN_UPDATES = 1000*10; // In milliseconds (10s currently)
 	
 	@Override public void onCreate()
@@ -187,8 +190,67 @@ public class GPSretrieve extends Service implements LocationListener
 		alertDialog.show();
 	}
 	
+	@SuppressLint("NewApi")
 	@Override public void onLocationChanged(Location location)
 	{
+		// If there is a previous location, check if the previous location
+		// is more accurate
+		if (lastLocation!=null)
+		{
+			// Determine which provider this is coming from
+			if (location.getProvider()==LocationManager.GPS_PROVIDER)
+			{
+				// If this is coming from the GPS provider, always accept, as
+				// the GPS provider is the most accurate provider we have
+			}
+			// If this is not coming from the GPS provider, see if a more
+			// accurate location is available
+			else
+			{
+				// Determine if the GPS provider is still enabled
+				if (isGPSEnabled)
+				{
+					// If so, discard this location
+					return;
+				}
+				else
+				{
+					// If not, determine if the previous location came from a
+					// network provider
+					if (lastLocation.getProvider()==LocationManager.NETWORK_PROVIDER)
+					{
+						// If so, compare the accuracy of this location to the
+						// previous location
+						if (location.getAccuracy()<lastLocation.getAccuracy())
+						{
+							// If the last location was more accurate, determine if it
+							// has expired
+							long timeSinceLastLocation;
+							
+							if (Build.VERSION.SDK_INT>=17)
+							{
+								timeSinceLastLocation = location.getElapsedRealtimeNanos()-lastLocation.getElapsedRealtimeNanos();
+							}
+							else
+							{
+								timeSinceLastLocation = location.getTime()-lastLocation.getTime();
+							}
+							
+							if (timeSinceLastLocation>=MAX_TIME_BTWN_UPDATES)
+							{
+								// If so, accept this location
+							}
+							else
+							{
+								// If not, discard this location
+								return;
+							}
+						}
+					}
+				}
+			}
+		}
+		
 		// Notify any listening threads about the location change
 		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
 		{

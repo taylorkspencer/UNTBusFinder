@@ -31,8 +31,8 @@ public class MapActivity extends Activity
 	GPSretrieve gps;
 	LocationCommunicator link;
 	PointOverlay myLocOverlay;
-	List<StationaryPointOverlay> busStopOverlays;
-	StationaryPointOverlay busStopOverlayStyle;
+	List<PointOverlay> busStopOverlays;
+	PointOverlay busStopOverlayStyle;
 	List<PointOverlay> busLocOverlays;
 	PointOverlay busLocOverlayStyle;
 	List<PathOverlay> busPathOverlays;
@@ -71,7 +71,7 @@ public class MapActivity extends Activity
 		
 		// Set up the lists for the overlays
 		busPathOverlays = new ArrayList<PathOverlay>();
-		busStopOverlays = new ArrayList<StationaryPointOverlay>();
+		busStopOverlays = new ArrayList<PointOverlay>();
 		busLocOverlays = new ArrayList<PointOverlay>();
 		
 		// Initialize the LocationSendingTimer
@@ -350,20 +350,23 @@ public class MapActivity extends Activity
 	// until we start getting this from the server)
 	protected void addDiscParkBusRouteStops()
 	{
-		StationaryPointOverlay dpRouteStop1 = busStopOverlayStyle;
-		dpRouteStop1 = (StationaryPointOverlay)setBusStopOverlayAttributes(dpRouteStop1);
+		//TODO: Add the first bus stop for the Discovery Park route
+		PointOverlay dpRouteStop1 = busStopOverlayStyle;
+		dpRouteStop1 = setBusStopOverlayAttributes(dpRouteStop1);
 		dpRouteStop1.setColor(Color.parseColor("#009933"));
 		dpRouteStop1.setLocation(new GeoPoint(33.25340, -97.15394));
 		busStopOverlays.add(dpRouteStop1);
 		
-		StationaryPointOverlay dpRouteStop2 = busStopOverlayStyle;
-		dpRouteStop2 = (StationaryPointOverlay)setBusStopOverlayAttributes(dpRouteStop2);
+		//TODO: Add the second bus stop for the Discovery Park route
+		PointOverlay dpRouteStop2 = busStopOverlayStyle;
+		dpRouteStop2 = setBusStopOverlayAttributes(dpRouteStop2);
 		dpRouteStop2.setColor(Color.parseColor("#009933"));
 		dpRouteStop2.setLocation(new GeoPoint(33.25372, -97.15073));
 		busStopOverlays.add(dpRouteStop2);
 		
-		StationaryPointOverlay dpRouteStop3 = busStopOverlayStyle;
-		dpRouteStop3 = (StationaryPointOverlay)setBusStopOverlayAttributes(dpRouteStop3);
+		//TODO: Add the third bus stop for the Discovery Park route
+		PointOverlay dpRouteStop3 = busStopOverlayStyle;
+		dpRouteStop3 = setBusStopOverlayAttributes(dpRouteStop3);
 		dpRouteStop3.setColor(Color.parseColor("#009933"));
 		dpRouteStop3.setLocation(new GeoPoint(33.21396, -97.14843));
 		busStopOverlays.add(dpRouteStop3);
