@@ -19,9 +19,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 public class MapActivity extends Activity
 {
@@ -73,9 +75,6 @@ public class MapActivity extends Activity
 		busPathOverlays = new ArrayList<PathOverlay>();
 		busStopOverlays = new ArrayList<PointOverlay>();
 		busLocOverlays = new ArrayList<PointOverlay>();
-		
-		// Initialize the LocationSendingTimer
-		locUpdTimer = new LocationSendingTimer();
 	}
 	
 	// Set the initial locations of the MapView and its Overlays
@@ -415,6 +414,7 @@ public class MapActivity extends Activity
 	{
 		// Query the server for location updates and if one is received,
 		// send the new location to any listeners
+		locUpdTimer = new LocationSendingTimer();
 		locUpdTimer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MIN_TIME_BTWN_UPDATES);
 		
 		// If all this is successful, set isSendingLocation to true to 
@@ -426,7 +426,7 @@ public class MapActivity extends Activity
 	public void stopSendingLocation()
 	{
 		// Stop sending the location to the server
-		locUpdTimer.cancel(true);
+		locUpdTimer.cancel(false);
 		
 		// Set isSendingLocation to false to indicate that sending location has stopped
 		isSendingLocation = false;
@@ -525,34 +525,62 @@ public class MapActivity extends Activity
 		super.onPause();
 	}
 	
-	class LocationSendingTimer extends AsyncTask<Long, Void, Long>
+	// Display an error message toast and change the toggle
+	// text to Send My Location
+	protected void onLocationSendingError()
 	{
-		// Send the user's location to the server
-		@Override protected Long doInBackground(Long... interval)
+		Toast.makeText(this, "Could not send the location to the server.", Toast.LENGTH_SHORT).show();
+		invalidateOptionsMenu();
+	}
+	
+	class LocationSendingTimer extends AsyncTask<Long, Void, Boolean> implements Runnable
+	{
+		Handler taskTimer;
+		long taskInterval;
+		
+		@Override public void run()
 		{
-			// Wait for the timer interval to pass
-			try
+			new LocationSendingTimer().execute(taskInterval);
+		}
+		
+		@Override protected void onPreExecute()
+		{
+			// Initialize the Handler
+			taskTimer = new Handler();
+		}
+		
+		// Send the user's location to the server
+		@Override protected Boolean doInBackground(Long... interval)
+		{
+			// Set the time interval for the Handler
+			taskInterval = interval[0];
+			
+			// If sending the location was successful, return true to indicate success
+			if (link.sendLocation(new GeoPoint(gps.getLocation())))
 			{
-				Thread.sleep(interval[0]);
+				return true;
 			}
-			catch (InterruptedException cancelled)
+			// If not, return false to indicate failure
+			else
 			{
-				// This means location sending is being cancelled - do nothing
+				return false;
 			}
-			finally
+		}
+		
+		@Override protected void onPostExecute(Boolean success)
+		{
+			// If sending the location was successful, renew the locationSenderTimer
+			if (success)
 			{
-				// If sending the location was successful, renew the locationSenderTimer
-				if (link.sendLocation(new GeoPoint(gps.getLocation())))
-				{
-					locUpdTimer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MIN_TIME_BTWN_UPDATES);
-				}
-				// If not, stop sending location to the server
-				else
-				{
-					stopSendingLocation();
-				}
+				taskTimer.postDelayed(this, taskInterval);
 			}
-			return interval[0];
+			// If sending location failed, stop retrieving locations, display an error
+			// message toast, and change the toggle text to Send My Location
+			else
+			{
+				stopSendingLocation();
+				onLocationSendingError();
+			}
 		}
 	}
 }
