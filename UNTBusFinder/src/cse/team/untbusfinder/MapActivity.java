@@ -104,7 +104,7 @@ public class MapActivity extends Activity
 						mapView.getController().setCenter(new GeoPoint(location));
 						
 						// Since changing the center of the map will set centerOnMyLocation to
-						// false, 
+						// false, reset centerOnMyLocation to true
 						centerOnMyLocation = true;
 					}
 					
@@ -282,14 +282,14 @@ public class MapActivity extends Activity
 			getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
 		}
 	}
-	//TODO: Display the path for the Discovery Park route (temporary implementation
+	// Display the path for the Discovery Park route (temporary implementation
 	// until we start getting this from the server)
 	protected void addDiscParkBusRoute()
 	{
 		PathOverlay discoveryParkRoutePath = busPathOverlayStyle;
 		discoveryParkRoutePath.setColor(Color.parseColor("#009933"));
 		
-		//TODO: From Discovery Park to UNT main campus
+		// From Discovery Park to UNT main campus
 		discoveryParkRoutePath.addPoint(new GeoPoint(33.25352, -97.15418));
 		discoveryParkRoutePath.addPoint(new GeoPoint(33.25267, -97.15481));
 		discoveryParkRoutePath.addPoint(new GeoPoint(33.25105, -97.15173));
@@ -324,7 +324,7 @@ public class MapActivity extends Activity
 		discoveryParkRoutePath.addPoint(new GeoPoint(33.21369, -97.14846));
 		discoveryParkRoutePath.addPoint(new GeoPoint(33.21376, -97.14844));
 		
-		//TODO: From UNT main campus to Discovery Park
+		// From UNT main campus to Discovery Park
 		discoveryParkRoutePath.addPoint(new GeoPoint(33.21569, -97.14840));
 		discoveryParkRoutePath.addPoint(new GeoPoint(33.21580, -97.16137));
 		discoveryParkRoutePath.addPoint(new GeoPoint(33.21632, -97.16136));

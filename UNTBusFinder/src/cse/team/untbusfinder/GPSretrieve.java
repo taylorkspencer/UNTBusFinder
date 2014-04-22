@@ -158,38 +158,6 @@ public class GPSretrieve extends Service implements LocationListener
 		return this.canGetLocation;
 	}
 	
-	//TODO: This should be moved to the main activity - this class shouldn't have
-	// any GUI aspects
-	//TODO: I think I know where you're going with this - let's use the methods
-	// startPolling() and stopPolling() so we turn off all the providers
-	public void showSettingsAlert()
-	{
-		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-		
-		alertDialog.setTitle("GPS in settings");
-		
-		alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?");
-		
-		alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener()
-		{
-			public void onClick(DialogInterface dialog, int which)
-			{
-				Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-				startActivity(intent);
-			}
-		});
-		
-		alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-		{
-			public void onClick(DialogInterface dialog, int which)
-			{
-				dialog.cancel();
-			}
-		});
-		
-		alertDialog.show();
-	}
-	
 	@SuppressLint("NewApi")
 	@Override public void onLocationChanged(Location location)
 	{

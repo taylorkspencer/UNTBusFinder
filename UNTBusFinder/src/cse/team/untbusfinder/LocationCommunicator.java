@@ -300,9 +300,10 @@ public class LocationCommunicator extends Service implements Runnable
 				{
 					listeners.get(lIndex).onLocationChanged(toSend);
 				}
+				
+				// Set the location equal to the new location
+				location = newLocation;
 			}
-			// Set the location equal to the new location
-			location = newLocation;
 		}
 		// Renew the locationQueryTimer
 		locationQueryTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES);
