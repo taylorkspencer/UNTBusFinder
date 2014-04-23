@@ -1,5 +1,6 @@
 package cse.team.untbusfinder;
 
+//TODO: Clean out imports
 import java.util.List;
 import java.util.ArrayList;
 
@@ -43,12 +44,6 @@ public class MapActivity extends Activity
 		setupActionBar();
 	}
 	
-	// Start and/or resume polling for location
-	@Override protected void onResume()
-	{
-		super.onResume();
-	}
-	
 	// Adjust the action bar for this activity
 	private void setupActionBar()
 	{
@@ -87,68 +82,5 @@ public class MapActivity extends Activity
 			// If not, do nothing and return false
 			return false;
 		}
-	}
-	
-	@Override public boolean onCreateOptionsMenu(Menu menu)
-	{
-		// Inflate the menu; this adds items to the action bar if it is present
-		getMenuInflater().inflate(R.menu.map, menu);
-		
-		// If the user is not sending location, set the toggle text to
-		// Send My Location
-		if (!((MapFragment)getFragmentManager().findFragmentById(R.id.mapActivityFragment)).isSendingLocation())
-		{
-			menu.findItem(R.id.toggle_send_location).setTitle(R.string.action_send_my_location);
-		}
-		// If the user is sending location, set the toggle text to Stop
-		// Sending My Location
-		else
-		{
-			menu.findItem(R.id.toggle_send_location).setTitle(R.string.action_stop_sending_my_location);
-		}
-		return true;
-	}
-	
-	@Override public boolean onOptionsItemSelected(MenuItem item)
-	{
-		//TODO: To be eliminated as these options are moved to the RouteActivity
-		// Determine if the user chose the Send My Location toggle item
-		if (item.getItemId()==R.id.toggle_send_location)
-		{
-			// If the user is not sending location, start sending location
-			if (!((MapFragment)getFragmentManager().findFragmentById(R.id.mapActivityFragment)).isSendingLocation())
-			{
-				// Turn on location sending
-				((MapFragment)getFragmentManager().findFragmentById(R.id.mapActivityFragment)).startSendingLocation();
-				
-				// If location sending was successfully turned on, change
-				// the toggle text to Stop Sending My Location
-				item.setTitle(R.string.action_stop_sending_my_location);
-			}
-			// If the user is sending location, stop sending location
-			else
-			{
-				// Turn off location sending
-				((MapFragment)getFragmentManager().findFragmentById(R.id.mapActivityFragment)).stopSendingLocation();
-				
-				// If location sending was successfully turned off, change
-				// the toggle text to Send My Location
-				item.setTitle(R.string.action_send_my_location);
-			}
-			return true;
-		}
-		// For other items, return false
-		else
-		{
-			return false;
-		}
-	}
-	
-	// Display an error message toast and change the toggle
-	// text to Send My Location
-	protected void onLocationSendingError()
-	{
-		Toast.makeText(this, "Could not send the location to the server.", Toast.LENGTH_SHORT).show();
-		invalidateOptionsMenu();
 	}
 }

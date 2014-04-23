@@ -3,10 +3,8 @@ package cse.team.untbusfinder;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,7 +13,6 @@ import android.location.LocationProvider;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 
 public class GPSretrieve extends Service implements LocationListener
 {
@@ -24,6 +21,7 @@ public class GPSretrieve extends Service implements LocationListener
 	boolean isNetworkEnabled = false;
 	boolean canGetLocation = false;
 	boolean isPolling = false;
+	boolean pollingStateLock = false;
 	
 	protected LocationManager locMgr;
 	Location lastLocation;
@@ -58,50 +56,87 @@ public class GPSretrieve extends Service implements LocationListener
 		return sInstance;
 	}
 	
+	//TODO: Enables the polling lock (used by the location sending methods
+	// to prevent GPS polling from going off)
+	public void lockPollingState()
+	{
+		pollingStateLock = true;
+	}
+	
+	//TODO: Disables the polling lock (used by the location sending methods
+	// to prevent GPS polling from going off)
+	public void unlockPollingState()
+	{
+		pollingStateLock = false;
+	}
+	
 	// Start polling for location updates
 	public void startPolling()
 	{
-		try
+		//TODO: If the polling state is locked, do nothing
+		if (!isPollingStateLocked())
 		{
-			// Listen for location updates from the network provider and if one is
-			// received, change the location variable to that location
-			locMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-											MIN_TIME_BTWN_UPDATES,
-											MIN_DISTANCE_CHANGE_FOR_UPDATES,
-											this);
-			// Listen for location updates from the GPS provider and if one is
-			// received, change the location variable to that location
-			locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-											MIN_TIME_BTWN_UPDATES,
-											MIN_DISTANCE_CHANGE_FOR_UPDATES,
-											this);
-			
-			// If all this is successful, set isPolling to true to indicate that
-			// polling for location has begun
-			isPolling = true;
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
+			//TODO: Only enable polling if it is not already enabled
+			if (!isPolling())
+			{
+				try
+				{
+					// Listen for location updates from the network provider and if one is
+					// received, change the location variable to that location
+					locMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+													MIN_TIME_BTWN_UPDATES,
+													MIN_DISTANCE_CHANGE_FOR_UPDATES,
+													this);
+					// Listen for location updates from the GPS provider and if one is
+					// received, change the location variable to that location
+					locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+													MIN_TIME_BTWN_UPDATES,
+													MIN_DISTANCE_CHANGE_FOR_UPDATES,
+													this);
+					
+					// If all this is successful, set isPolling to true to indicate that
+					// polling for location has begun
+					isPolling = true;
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	
 	// Stop polling for location updates
 	public void stopPolling()
 	{
-		try
+		//TODO: If the polling state is locked, do nothing
+		if (!isPollingStateLocked())
 		{
-			// Stop listening for location updates
-			locMgr.removeUpdates(this);
-			
-			// If all this is successful, set isPolling to false to indicate that
-			// polling for location has stopped
-			isPolling = false;
+			//TODO: Only disable polling if it is already enabled
+			if (isPolling())
+			{
+				try
+				{
+					// Stop listening for location updates
+					locMgr.removeUpdates(this);
+					
+					// If all this is successful, set isPolling to false to indicate that
+					// polling for location has stopped
+					isPolling = false;
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
 		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+	}
+	
+	//TODO: Returns the state of the polling lock (used by the location
+	// sending methods to prevent GPS polling from going off)
+	public boolean isPollingStateLocked()
+	{
+		return pollingStateLock;
 	}
 	
 	// Returns whether GPSretrieve is actively polling for location

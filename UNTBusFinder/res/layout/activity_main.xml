@@ -7,7 +7,8 @@
 		  android:layout_height="0dp"
 		  android:layout_weight="1"
 		  android:layout_marginTop="15dp"
-		  android:src="@drawable/untbusfinder_icon"/>
+		  android:src="@drawable/untbusfinder_icon"
+		  android:contentDescription="@string/app_icon_caption"/>
 	<Button android:id="@+id/button_Map"
 		  android:layout_width="fill_parent"
 		  android:layout_height="0dp"

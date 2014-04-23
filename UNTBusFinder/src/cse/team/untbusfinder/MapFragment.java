@@ -13,7 +13,6 @@ import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 
 import android.app.Fragment;
-import android.app.ActionBar;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -43,7 +42,6 @@ public class MapFragment extends Fragment
 	PointOverlay busLocOverlayStyle;
 	List<PathOverlay> busPathOverlays;
 	PathOverlay busPathOverlayStyle;
-	LocationSendingTimer locUpdTimer;
 	
 	boolean centerOnMyLocation, sendingLocation = false;
 	
@@ -262,12 +260,9 @@ public class MapFragment extends Fragment
 	// Start and/or resume polling for location
 	@Override public void onResume()
 	{
-		// Determine if the location is being sent to the server
-		if (!isSendingLocation())
-		{
-			// Begin polling for location from GPSretrieve
-			gps.startPolling();
-		}
+		// Begin polling for location from GPSretrieve
+		gps.startPolling();
+		
 		// Begin polling for location from LocationCommunicator
 		link.startPolling();
 		
@@ -401,47 +396,16 @@ public class MapFragment extends Fragment
 		mapView.getOverlays().add(myLocOverlay);
 	}
 	
-	//TODO: Returns whether the MapFragment is sending location
-	public boolean isSendingLocation()
-	{
-		return sendingLocation;
-	}
-	
-	// Start sending locations to the server
-	public void startSendingLocation()
-	{
-		// Query the server for location updates and if one is received,
-		// send the new location to any listeners
-		locUpdTimer = new LocationSendingTimer();
-		locUpdTimer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MIN_TIME_BTWN_UPDATES);
-		
-		// If all this is successful, set sendingLocation to true to 
-		// indicate that sending location has begun
-		sendingLocation = true;
-	}
-	
-	// Stop sending locations to the server
-	public void stopSendingLocation()
-	{
-		// Stop sending the location to the server
-		locUpdTimer.cancel(false);
-		
-		// Set sendingLocation to false to indicate that sending location has stopped
-		sendingLocation = false;
-	}
-	
 	// If the location is not being sent to the server, stop polling for location
 	// when UNT Bus Finder closes
 	@Override public void onPause()
 	{
-		// Determine if the location is being sent to the server
-		if (!isSendingLocation())
-		{
-			// Stop polling for location from GPSretrieve
-			gps.stopPolling();
-		}
+		// Stop polling for location from GPSretrieve
+		gps.stopPolling();
+		
 		// Stop polling for location from LocationCommunicator
 		link.stopPolling();
+		
 		super.onPause();
 	}
 	
@@ -451,56 +415,5 @@ public class MapFragment extends Fragment
 	{
 		Toast.makeText(getActivity(), "Could not send the location to the server.", Toast.LENGTH_SHORT).show();
 		getActivity().invalidateOptionsMenu();
-	}
-	
-	class LocationSendingTimer extends AsyncTask<Long, Void, Boolean> implements Runnable
-	{
-		Handler taskTimer;
-		long taskInterval;
-		
-		@Override public void run()
-		{
-			new LocationSendingTimer().execute(taskInterval);
-		}
-		
-		@Override protected void onPreExecute()
-		{
-			// Initialize the Handler
-			taskTimer = new Handler();
-		}
-		
-		// Send the user's location to the server
-		@Override protected Boolean doInBackground(Long... interval)
-		{
-			// Set the time interval for the Handler
-			taskInterval = interval[0];
-			
-			// If sending the location was successful, return true to indicate success
-			if (link.sendLocation(new GeoPoint(gps.getLocation())))
-			{
-				return true;
-			}
-			// If not, return false to indicate failure
-			else
-			{
-				return false;
-			}
-		}
-		
-		@Override protected void onPostExecute(Boolean success)
-		{
-			// If sending the location was successful, renew the locationSenderTimer
-			if (success)
-			{
-				taskTimer.postDelayed(this, taskInterval);
-			}
-			// If sending location failed, stop retrieving locations, display an error
-			// message toast, and change the toggle text to Send My Location
-			else
-			{
-				stopSendingLocation();
-				onLocationSendingError();
-			}
-		}
 	}
 }

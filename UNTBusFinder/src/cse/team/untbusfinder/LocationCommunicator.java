@@ -20,9 +20,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.EntityUtils;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpGet;
@@ -42,11 +40,11 @@ public class LocationCommunicator extends Service implements Runnable
 	// Variables declared here so that they can be accessed in the LocationListener
 	boolean isNetworkEnabled = false;
 	boolean isPolling = false;
+	boolean pollingStateLock = false;
 	
 	Handler locationQueryTimer;
 	HttpParams communicatorParams;
-	DefaultHttpClient locServerClient;
-	CookieStore locServerCookieStore;
+	HttpClient locServerClient;
 	String serverURL;
 	
 	//TODO: To be converted to an array to store multiple locations
@@ -88,10 +86,8 @@ public class LocationCommunicator extends Service implements Runnable
 		HttpConnectionParams.setConnectionTimeout(communicatorParams, MAX_TIME_TO_WAIT);
 		HttpConnectionParams.setSoTimeout(communicatorParams, MAX_TIME_TO_WAIT);
 		
-		// Create the HTTP client and its cookie store
+		// Create the HTTP client
 		locServerClient = new DefaultHttpClient(communicatorParams);
-		locServerCookieStore = new BasicCookieStore();
-		locServerClient.setCookieStore(locServerCookieStore);
 	}
 	
 	// Return a static instance of this Service for Activities
@@ -112,19 +108,41 @@ public class LocationCommunicator extends Service implements Runnable
 		return serverURL;
 	}
 	
+	//TODO: Enables the polling lock (used by the location sending methods
+	// to prevent GPS polling from going off)
+	public void lockPollingState()
+	{
+		pollingStateLock = true;
+	}
+	
+	//TODO: Disables the polling lock (used by the location sending methods
+	// to prevent GPS polling from going off)
+	public void unlockPollingState()
+	{
+		pollingStateLock = false;
+	}
+	
 	// Start polling the server for location updates
 	public void startPolling()
 	{
-		// Check to make sure the server URL is not null or empty
-		if ((serverURL!=null)&&(serverURL.length()>0))
+		//TODO: If the polling state is locked, do nothing
+		if (!isPollingStateLocked())
 		{
-			// Query the server for location updates and if one is received,
-			// send the new location to any listeners
-			if (locationQueryTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES))
+			//TODO: Only enable polling if it is not already enabled
+			if (!isPolling())
 			{
-				// If all this is successful, set isPolling to true to indicate that
-				// polling for location has begun
-				isPolling = true;
+				// Check to make sure the server URL is not null or empty
+				if ((serverURL!=null)&&(serverURL.length()>0))
+				{
+					// Query the server for location updates and if one is received,
+					// send the new location to any listeners
+					if (locationQueryTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES))
+					{
+						// If all this is successful, set isPolling to true to indicate that
+						// polling for location has begun
+						isPolling = true;
+					}
+				}
 			}
 		}
 	}
@@ -132,11 +150,26 @@ public class LocationCommunicator extends Service implements Runnable
 	// Stop polling the server for location updates
 	public void stopPolling()
 	{
-		// Stop querying the server for location updates
-		locationQueryTimer.removeCallbacks(this);
-		
-		// Set isPolling to false to indicate that polling for location has stopped
-		isPolling = false;
+		//TODO: If the polling state is locked, do nothing
+		if (!isPollingStateLocked())
+		{
+			//TODO: Only disable polling if it is already enabled
+			if (isPolling())
+			{
+				// Stop querying the server for location updates
+				locationQueryTimer.removeCallbacks(this);
+				
+				// Set isPolling to false to indicate that polling for location has stopped
+				isPolling = false;
+			}
+		}
+	}
+	
+	//TODO: Returns the state of the polling lock (used by the location
+	// sending methods to prevent GPS polling from going off)
+	public boolean isPollingStateLocked()
+	{
+		return pollingStateLock;
 	}
 	
 	// Returns whether LocationCommunicator is actively polling the server for locations
@@ -223,6 +256,17 @@ public class LocationCommunicator extends Service implements Runnable
 			stopPolling();
 			return;
 		}
+		
+		//TODO: Add our user-agent
+		try
+		{
+			locServerHTTPget.addHeader("User-Agent", "UNTBusFinder/"+getPackageManager().getPackageInfo(getPackageName(), 0).versionName+" (Android)");
+		}
+		catch (PackageManager.NameNotFoundException notInstalled)
+		{
+			// Do nothing
+		}
+		
 		// Query the server for location updates
 		HttpResponse locServerResponse = null;
 		try
