@@ -1,0 +1,19 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	  android:layout_width="fill_parent"
+	  android:layout_height="fill_parent"
+	  android:orientation="vertical">
+	<org.osmdroid.views.MapView
+		  android:id="@+id/generalMap"
+		  android:layout_width="fill_parent"
+		  android:layout_height="wrap_content"
+		  android:layout_weight=".95"
+		  android:clickable="true"/>
+
+	<ToggleButton
+	    android:id="@+id/toggleButton"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:text="@string/SendToggle" 
+	    android:layout_weight=".05"/>
+
+</LinearLayout>
