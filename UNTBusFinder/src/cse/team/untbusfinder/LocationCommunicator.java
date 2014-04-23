@@ -47,8 +47,6 @@ public class LocationCommunicator extends Service implements Runnable
 	HttpParams communicatorParams;
 	DefaultHttpClient locServerClient;
 	CookieStore locServerCookieStore;
-	HttpPost locServerHTTPpost;
-	HttpGet locServerHTTPget;
 	String serverURL;
 	
 	//TODO: To be converted to an array to store multiple locations
@@ -214,9 +212,10 @@ public class LocationCommunicator extends Service implements Runnable
 	@Override public void run()
 	{
 		// Attempt to connect to the server
+		HttpGet locServerHTTPget;
 		try
 		{
-			locServerHTTPpost = new HttpPost(serverURL);
+			locServerHTTPget = new HttpGet(serverURL);
 		}
 		// If the URL is invalid, stop polling and exit the function
 		catch (IllegalArgumentException invalidURL)
@@ -228,7 +227,7 @@ public class LocationCommunicator extends Service implements Runnable
 		HttpResponse locServerResponse = null;
 		try
 		{
-			locServerResponse = locServerClient.execute(locServerHTTPpost);
+			locServerResponse = locServerClient.execute(locServerHTTPget);
 		}
 		// If the server is not a HTTP server, stop polling and exit the function
 		catch (ClientProtocolException notHTTPserver)

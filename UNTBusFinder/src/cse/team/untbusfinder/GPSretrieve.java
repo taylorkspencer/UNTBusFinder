@@ -39,7 +39,8 @@ public class GPSretrieve extends Service implements LocationListener
 	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
 	private static final long MAX_TIME_BTWN_UPDATES = 1000*100; // In milliseconds (100s currently)
 	private static final long MIN_TIME_BTWN_UPDATES = 1000*10; // In milliseconds (10s currently)
-	
+	private static final int MAX_TIME_TO_WAIT = 1000*10; // In milliseconds (10 seconds)
+
 	@Override public void onCreate()
 	{
 		super.onCreate();
