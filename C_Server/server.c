@@ -17,11 +17,11 @@ int main (){
 	int server_sockfd, client_sockfd, bytesReceived, server_len;
 	int client_len, i, j;
 	int word_size;
-	char *pstring, message[BUFFERSIZE], location[BUFFERSIZE];
+	char *pstring, message[BUFFERSIZE], location[100];
 	char temp[BUFFERSIZE];
 	char request[300], message_body[BUFFERSIZE];
 	struct sockaddr_in server_address;
-	struct sockaddr_in client_address;	
+	struct sockaddr_in client_address;
 
 	// Create an unnamed socket
 	server_sockfd = socket (AF_INET, SOCK_STREAM, 0);
@@ -81,8 +81,9 @@ int main (){
 			write(client_sockfd, "Connection: close\r\n", 19);
 			printf("Connection: close\r\n");
 			write(client_sockfd, "Content-Type: application/x-www-form-urlencoded\r\n\r\n", 51); // Modify this to be accurate
-			printf("Content-Type: application/x-www-form-urlencoded\r\n\r\n");
+			printf("Content-Type: application/json\r\n\r\n");
 			write(client_sockfd, location, strlen(location));
+			write(client_sockfd, "\r\n\r\n", 4);
 			printf("%s\n\n", location);
 			close(client_sockfd);
 			continue;
@@ -108,15 +109,37 @@ int main (){
 					continue;
 				}
 
-				pstring += 3;
-				memset(location, '\0', BUFFERSIZE);
-				strcpy(location, pstring);
+				// Parse for and save the latitude
+				pstring = strstr(message, "lat=");
+				pstring += 4;
+				memset(temp, '\0', BUFFERSIZE);
+				i = 0;
+				while(pstring[i] != '&'){
+					temp[i] = pstring[i];
+					i++;
+				}
+				memset(location, '\0', 100);
+				strcpy(location, "{ \"lat\": \0");
+				strcat(location, temp);
+				strcat(location, ", \"long\": \0");
+
+				// Parse for and save the longitude
+				pstring = strstr(message, "long=");
+				pstring += 5;
+				strcat(location, pstring);
+				strcat(location, " }\0");
+
+				// Send response
 				write(client_sockfd, "HTTP/1.1 201 Created\r\n", 22);
-				printf("HTTP/1.1 201 Created\r\n");
+				printf("HTTP/1.1 201 Created\r\n"); // Debug
+				write(client_sockfd, "Content-Type: text\r\n", 20);
+				printf("Content-Type: text\r\n");
 				write(client_sockfd, "Connection: close\r\n\r\n", 21);
-				printf("Connection: close\r\n\r\n");
+				printf("Connection: close\r\n\r\n"); // Debug
+				write(client_sockfd, location, strlen(location));
+				printf("%s\n\n", location); // Debug
+				write(client_sockfd, "\r\n\r\n\0", 5);
 				close(client_sockfd);
-				printf("Saved the following location data: %s\n\n", location); //Debug
 				continue;
 			}
 		}
