@@ -12,16 +12,7 @@ import android.support.v4.app.NavUtils;
 import android.app.Fragment;
 
 public class RouteActivity extends Activity
-{
-	public static class MapFragment extends Fragment
-	{
-		@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-		{
-			// Inflate the layout for this fragment
-			return inflater.inflate(R.layout.activity_route, container, false);
-		}
-	}
-	
+{	
 	@Override protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);

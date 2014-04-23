@@ -2,15 +2,14 @@
 	  android:orientation="vertical"
 	  android:layout_width="match_parent"
 	  android:layout_height="match_parent">
-	<!-- Temporarily commented out to allow this activity to launch  -->
-	<!-- <fragment android:name="Map"
-		  android:id="@+id/map"
+	<fragment android:name="cse.team.untbusfinder.DataFragment"
+		  android:id="@+id/routeActivityDataFragment"
+		  android:layout_weight=".2"
+		  android:layout_width="match_parent"
+		  android:layout_height="0dp"/>
+	<fragment android:name="cse.team.untbusfinder.MapFragment"
+		  android:id="@+id/routeActivityMapFragment"
 		  android:layout_weight=".8"
 		  android:layout_width="match_parent"
 		  android:layout_height="0dp"/>
-    <fragment android:name="Data"
-		  android:id="@+id/data"
-		  android:layout_weight=".2"
-		  android:layout_width="match_parent"
-		  android:layout_height="0dp"/> -->
 </LinearLayout>
