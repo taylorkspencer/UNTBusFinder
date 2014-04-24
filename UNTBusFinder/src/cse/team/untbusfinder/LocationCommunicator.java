@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.Handler;
 
@@ -29,20 +30,20 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
-
 import org.json.JSONObject;
 import org.json.JSONException;
-
 import org.osmdroid.util.GeoPoint;
 
-public class LocationCommunicator extends Service implements Runnable
+import cse.team.untbusfinder.RouteActivity.LocationSendingTimer;
+
+public class LocationCommunicator extends Service
 {
 	// Variables declared here so that they can be accessed in the LocationListener
 	boolean isNetworkEnabled = false;
 	boolean isPolling = false;
 	boolean pollingStateLock = false;
 	
-	Handler locationQueryTimer;
+	LocationReceivingTimer locationQueryTimer;
 	HttpParams communicatorParams;
 	HttpClient locServerClient;
 	String serverURL;
@@ -67,9 +68,6 @@ public class LocationCommunicator extends Service implements Runnable
 	{
 		super.onCreate();
 		
-		// Initialize the locationQueryTimer
-		locationQueryTimer = new Handler();
-		
 		// Store a static instance of this Service in sInstance
 		sInstance = this;
 		
@@ -86,7 +84,7 @@ public class LocationCommunicator extends Service implements Runnable
 		HttpConnectionParams.setConnectionTimeout(communicatorParams, MAX_TIME_TO_WAIT);
 		HttpConnectionParams.setSoTimeout(communicatorParams, MAX_TIME_TO_WAIT);
 		
-		// Create the HTTP client
+		// Create the HTTP client and set its timeout
 		locServerClient = new DefaultHttpClient(communicatorParams);
 	}
 	
@@ -136,12 +134,12 @@ public class LocationCommunicator extends Service implements Runnable
 				{
 					// Query the server for location updates and if one is received,
 					// send the new location to any listeners
-					if (locationQueryTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES))
-					{
-						// If all this is successful, set isPolling to true to indicate that
-						// polling for location has begun
-						isPolling = true;
-					}
+					locationQueryTimer = new LocationReceivingTimer();
+					locationQueryTimer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MIN_TIME_BTWN_UPDATES);
+					
+					// If all this is successful, set isPolling to true to indicate that
+					// polling for location has begun
+					isPolling = true;
 				}
 			}
 		}
@@ -157,7 +155,7 @@ public class LocationCommunicator extends Service implements Runnable
 			if (isPolling())
 			{
 				// Stop querying the server for location updates
-				locationQueryTimer.removeCallbacks(this);
+				locationQueryTimer.cancel(false);
 				
 				// Set isPolling to false to indicate that polling for location has stopped
 				isPolling = false;
@@ -241,115 +239,155 @@ public class LocationCommunicator extends Service implements Runnable
 		return true;
 	}
 	
-	// Get locations from the server
-	@Override public void run()
+	class LocationReceivingTimer extends AsyncTask<Long, Void, String> implements Runnable
 	{
-		// Attempt to connect to the server
-		HttpGet locServerHTTPget;
-		try
+		Handler taskTimer;
+		long taskInterval;
+		
+		@Override public void run()
 		{
-			locServerHTTPget = new HttpGet(serverURL);
-		}
-		// If the URL is invalid, stop polling and exit the function
-		catch (IllegalArgumentException invalidURL)
-		{
-			stopPolling();
-			return;
+			new LocationReceivingTimer().execute(taskInterval);
 		}
 		
-		//TODO: Add our user-agent
-		try
+		@Override protected void onPreExecute()
 		{
-			locServerHTTPget.addHeader("User-Agent", "UNTBusFinder/"+getPackageManager().getPackageInfo(getPackageName(), 0).versionName+" (Android)");
-		}
-		catch (PackageManager.NameNotFoundException notInstalled)
-		{
-			// Do nothing
+			// Initialize the Handler
+			taskTimer = new Handler();
 		}
 		
-		// Query the server for location updates
-		HttpResponse locServerResponse = null;
-		try
+		// Get locations from the server
+		@Override protected String doInBackground(Long... interval)
 		{
-			locServerResponse = locServerClient.execute(locServerHTTPget);
-		}
-		// If the server is not a HTTP server, stop polling and exit the function
-		catch (ClientProtocolException notHTTPserver)
-		{
-			stopPolling();
-			return;
-		}
-		// If the connection could not be established, skip the next lines of code
-		catch (IOException serverConnectionError)
-		{
-			// Do nothing
-		}
-		finally
-		{
-			// Parse the JSON returned by the server
-			JSONObject responseJSON;
+			// Set the time interval for the Handler
+			taskInterval = interval[0];
+			
+			// Attempt to connect to the server
+			HttpGet locServerHTTPget;
 			try
 			{
-				responseJSON = new JSONObject(EntityUtils.toString(locServerResponse.getEntity()));
+				locServerHTTPget = new HttpGet(serverURL);
 			}
-			// If the JSON is invalid, stop polling and exit the function
-			catch (JSONException invalidJSON)
+			// If the URL is invalid, return null
+			catch (IllegalArgumentException invalidURL)
 			{
-				stopPolling();
-				return;
+				return null;
 			}
-			// If the JSON is invalid, stop polling and exit the function
-			catch (ParseException JSONparseException)
-			{
-				stopPolling();
-				return;
-			}
-			// If the JSON is invalid, stop polling and exit the function
-			catch (IOException JSONioException)
-			{
-				stopPolling();
-				return;
-			}
-			// If the server didn't return any JSON, stop polling and exit the function
-			catch (NullPointerException JSONnullException)
-			{
-				stopPolling();
-				return;
-			}
-			//TODO: Allow for retrieval of multiple locations
-			// Convert the JSON into a GeoPoint location
-			GeoPoint newLocation;
+			
+			//TODO: Add our user-agent
 			try
 			{
-				newLocation = new GeoPoint(responseJSON.getDouble("lat"), responseJSON.getDouble("long"));
+				locServerHTTPget.addHeader("User-Agent", "UNTBusFinder/"+getPackageManager().getPackageInfo(getPackageName(), 0).versionName+" (Android)");
 			}
-			// If there is no location in the JSON, stop polling and exit the function
-			catch (JSONException noLocationInJSON)
+			catch (PackageManager.NameNotFoundException notInstalled)
 			{
-				stopPolling();
-				return;
+				// Do nothing
 			}
-			// If a location is changed by MIN_DISTANCE_CHANGE_FOR_UPDATES or more
-			if (newLocation.distanceTo(location)>=MIN_DISTANCE_CHANGE_FOR_UPDATES)
+			
+			// Query the server for location updates
+			HttpResponse locServerResponse = null;
+			try
 			{
-				// Convert the GeoPoint to a Location
-				Location toSend = new Location("LocationCommunicator");
-				toSend.setLatitude(newLocation.getLatitude());
-				toSend.setLongitude(newLocation.getLongitude());
-				toSend.setBearing((float)newLocation.bearingTo(location));
-				
-				// Notify any listening threads about the location change
-				for (int lIndex=0; listeners.size()>lIndex; lIndex++)
+				locServerResponse = locServerClient.execute(locServerHTTPget);
+			}
+			// If the server is not a HTTP server, return null
+			catch (ClientProtocolException notHTTPserver)
+			{
+				return null;
+			}
+			// If the connection could not be established, return null
+			catch (IOException serverConnectionError)
+			{
+				return null;
+			}
+			
+			//TODO: Parse the server response to a string and return it
+			try
+			{
+				return EntityUtils.toString(locServerResponse.getEntity());
+			}
+			//TODO: If an IOException occurred, return null
+			catch (IOException responseIOexception)
+			{
+				return null;
+			}
+			//TODO: If an ParseException occurred, return null
+			catch (ParseException responseParseException)
+			{
+				return null;
+			}
+		}
+		
+		@Override protected void onPostExecute(String locServerResponse)
+		{
+			//TODO: If the server returned a response, parse it into JSON
+			if (locServerResponse!=null)
+			{
+				JSONObject responseJSON = null;
+				try
 				{
-					listeners.get(lIndex).onLocationChanged(toSend);
+					responseJSON = new JSONObject(locServerResponse);
+				}
+				// If the JSON is invalid, stop polling and exit the function
+				catch (JSONException invalidJSON)
+				{
+					stopPolling();
+				}
+				// If the JSON is invalid, stop polling and exit the function
+				catch (ParseException JSONparseException)
+				{
+					stopPolling();
+				}
+				// If the server didn't return any JSON, stop polling and exit the function
+				catch (NullPointerException JSONnullException)
+				{
+					stopPolling();
+				}
+				//TODO: Allow for retrieval of multiple locations
+				// Convert the JSON into a GeoPoint location
+				GeoPoint newLocation = null;
+				try
+				{
+					newLocation = new GeoPoint(responseJSON.getDouble("lat"), responseJSON.getDouble("long"));
+				}
+				// If there is no location in the JSON, stop polling and exit the function
+				catch (JSONException noLocationInJSON)
+				{
+					stopPolling();
+				}
+				// If the previous location is null, or if a location is changed by
+				// MIN_DISTANCE_CHANGE_FOR_UPDATES or more, update the location
+				if ((location==null)||(newLocation.distanceTo(location)>=MIN_DISTANCE_CHANGE_FOR_UPDATES))
+				{
+					// Convert the GeoPoint to a Location
+					Location toSend = new Location("LocationCommunicator");
+					toSend.setLatitude(newLocation.getLatitude());
+					toSend.setLongitude(newLocation.getLongitude());
+					
+					//TODO: If the previous location is not null, set the bearing of the new location
+					if (location!=null)
+					{
+						toSend.setBearing((float)newLocation.bearingTo(location));
+					}
+					
+					// Notify any listening threads about the location change
+					for (int lIndex=0; listeners.size()>lIndex; lIndex++)
+					{
+						listeners.get(lIndex).onLocationChanged(toSend);
+					}
+					
+					// Set the location equal to the new location
+					location = newLocation;
 				}
 				
-				// Set the location equal to the new location
-				location = newLocation;
+				// Renew the locationQueryTimer
+				taskTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES);
+			}
+			//TODO: If polling failed, stop polling
+			else
+			{
+				stopPolling();
 			}
 		}
-		// Renew the locationQueryTimer
-		locationQueryTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES);
 	}
 	
 	@Override public IBinder onBind(Intent intent)
