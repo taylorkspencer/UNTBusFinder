@@ -22,6 +22,7 @@ int main (){
 	char request[300], message_body[BUFFERSIZE];
 	struct sockaddr_in server_address;
 	struct sockaddr_in client_address;
+	FILE *output;
 
 	// Create an unnamed socket
 	server_sockfd = socket (AF_INET, SOCK_STREAM, 0);
@@ -44,7 +45,7 @@ int main (){
 	// Create a connection queue and wait for clients to arrive
 	listen (server_sockfd, 1000);
 
-	memset(location, '\0', BUFFERSIZE);
+	memset(location, '\0', 100);
 
 	// Main loop for the program
 	while(1){
@@ -57,7 +58,7 @@ int main (){
 			close (client_sockfd);
 			continue;
 		}
-		printf ("Server connected to client.\n\n"); // Debug
+		//printf ("Server connected to client.\n\n"); // Debug
 
 		// Receive request from the client
 		memset(message, '\0', BUFFERSIZE);
@@ -70,42 +71,48 @@ int main (){
 			continue;
 		}
 		//printf("Received message from client.\n\n"); // Short debug
-		printf ("Received message from %s\n\n%s\n\n", inet_ntoa(client_address.sin_addr), message); // Long debug
+		//printf ("Received message from %s\n\n%s\n\n", inet_ntoa(client_address.sin_addr), message); // Long debug
 
 		// Get request
 		i = 0;
 		if((pstring = strstr(message, "GET")) != NULL){
-			printf("Received get request. Sending the following response:\n\n"); // Debug
+			output = fopen("output.txt", "a");
+			fprintf(output, "Received get request. Sending the following response:\n\n"); // Debug
 			write(client_sockfd, "HTTP/1.1 200 OK\r\n", 17);
-			printf("HTTP/1.1 200 OK\r\n");
+			fprintf(output, "HTTP/1.1 200 OK\r\n");
 			write(client_sockfd, "Connection: close\r\n", 19);
-			printf("Connection: close\r\n");
+			fprintf(output, "Connection: close\r\n");
 			write(client_sockfd, "Content-Type: application/x-www-form-urlencoded\r\n\r\n", 51); // Modify this to be accurate
-			printf("Content-Type: application/json\r\n\r\n");
+			fprintf(output, "Content-Type: application/json\r\n\r\n");
 			write(client_sockfd, location, strlen(location));
 			write(client_sockfd, "\r\n\r\n", 4);
-			printf("%s\n\n", location);
+			fprintf(output, "%s\n\n", location);
+			fclose(output);
 			close(client_sockfd);
 			continue;
 		}
 
 		else{
 			if((pstring = strstr(message, "POST")) == NULL){
-				printf("Received unknown request type. Sending error response to client and discarding.\n\n"); // Debug
+				output = fopen("output.txt", "a");
+				fprintf(output, "Received unknown request type. Sending error response to client and discarding.\n\n"); // Debug
 				write(client_sockfd, "HTTP/1.1 400 Bad Request\r\n", 26);
 				write(client_sockfd, "Connection: close\r\n\r\n", 21);
+				fclose(output);
 				close(client_sockfd);
 				continue;
 			}
 
 			else{
-				printf("Received a POST request. Sending the following response:\n\n"); // Debug
+				output = fopen("output.txt", "a");
+				fprintf(output, "Received a POST request. Sending the following response:\n\n"); // Debug
 				pstring = strstr(message, "\n\r\n");
 				if(pstring == NULL){
-					printf("No body. Discarding\n\n"); // Debug
+					fprintf(output, "No body. Discarding\n\n"); // Debug
 					write(client_sockfd, "HTTP/1.1 400 Bad Request\r\n", 26);
 					write(client_sockfd, "Connection: close\r\n\r\n\r\n\r\n", 25);
 					close(client_sockfd);
+					fclose(output);
 					continue;
 				}
 
@@ -131,14 +138,15 @@ int main (){
 
 				// Send response
 				write(client_sockfd, "HTTP/1.1 201 Created\r\n", 22);
-				printf("HTTP/1.1 201 Created\r\n"); // Debug
+				fprintf(output, "HTTP/1.1 201 Created\r\n"); // Debug
 				write(client_sockfd, "Content-Type: text\r\n", 20);
-				printf("Content-Type: text\r\n");
+				fprintf(output, "Content-Type: text\r\n");
 				write(client_sockfd, "Connection: close\r\n\r\n", 21);
-				printf("Connection: close\r\n\r\n"); // Debug
+				fprintf(output, "Connection: close\r\n\r\n"); // Debug
 				write(client_sockfd, location, strlen(location));
-				printf("%s\n\n", location); // Debug
+				fprintf(output, "%s\n\n", location); // Debug
 				write(client_sockfd, "\r\n\r\n\0", 5);
+				fclose(output);
 				close(client_sockfd);
 				continue;
 			}
