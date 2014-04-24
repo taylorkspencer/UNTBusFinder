@@ -19,8 +19,6 @@ import android.app.Fragment;
 
 public class RouteActivity extends Activity
 {
-	//TODO: Move location sending code to the RouteActivity so we don't have two
-	// Activities sending location simultaneously
 	GPSretrieve gps;
 	LocationCommunicator link;
 	LocationSendingTimer locUpdTimer;
@@ -40,7 +38,7 @@ public class RouteActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_route);
 		
-		//TODO: Set the default route
+		// Set the default route
 		defaultRoute = getString(R.string.discParkRoute);
 		
 		// Retrieve the GPSretrieve and LocationCommunicator services
@@ -56,7 +54,8 @@ public class RouteActivity extends Activity
 		// Set the current route for this Activity
 		setRoute(defaultRoute);
 		
-		//TODO: Set sendingLocation to false
+		// Set sendingLocation to false
+		//TODO: Determine the current state of location sending
 		sendingLocation = false;
 	}
 	
@@ -67,12 +66,12 @@ public class RouteActivity extends Activity
 	
 	protected void setRoute(String route)
 	{
-		//TODO: Set the Activity title to the route name
+		// Set the Activity title to the route name
 		setTitle(route);
 		
 		currentRoute = route;
 		
-		//TODO: Check the menu item with the route name
+		// Check the menu item with the route name
 		invalidateOptionsMenu();
 	}
 	
@@ -124,10 +123,10 @@ public class RouteActivity extends Activity
 		}
 	}
 	
-	// If the location is not being sent to the server, stop polling for location
-	// when UNT Bus Finder closes
-	// (here as a placeholder for when we start polling for location in this
-	// activity)
+	// If the location is not being sent to the server, stop polling for
+	// location when UNT Bus Finder closes
+	// (here as a placeholder for when we start polling for location in
+	// this activity)
 	@Override protected void onPause()
 	{
 		super.onPause();
@@ -138,19 +137,18 @@ public class RouteActivity extends Activity
 		// Inflate the menu; this adds items to the action bar if it is present
 		getMenuInflater().inflate(R.menu.route, menu);
 		
-		//TODO: If the user is not sending location, set the toggle text to
-		// Board
+		// If the user is not sending location, set the toggle text to Board
 		if (!isSendingLocation())
 		{
 			menu.findItem(R.id.boardBusToggle).setTitle(R.string.actionBoardBus);
 		}
-		//TODO: If the user is sending location, set the toggle text to Leave
+		// If the user is sending location, set the toggle text to Leave
 		else
 		{
 			menu.findItem(R.id.boardBusToggle).setTitle(R.string.actionLeaveBus);
 		}
 		
-		//TODO: Check the menu item for the route that is currently set
+		// Check the menu item for the route that is currently set
 		if (getRoute().equals(getString(R.string.discParkRoute)))
 		{
 			menu.findItem(R.id.discParkRoute).setChecked(true);
@@ -160,7 +158,7 @@ public class RouteActivity extends Activity
 	
 	@Override public boolean onOptionsItemSelected(MenuItem item)
 	{
-		//TODO: Determine if the user chose the Board Bus toggle item
+		// Determine if the user chose the Board Bus toggle item
 		if (item.getItemId()==R.id.boardBusToggle)
 		{
 			// If the user is not sending location, start sending location
@@ -169,7 +167,7 @@ public class RouteActivity extends Activity
 				// Turn on location sending
 				startSendingLocation();
 				
-				//TODO: If location sending was successfully turned on, change
+				// If location sending was successfully turned on, change
 				// the toggle text to Leave
 				item.setTitle(R.string.actionLeaveBus);
 			}
@@ -179,16 +177,16 @@ public class RouteActivity extends Activity
 				// Turn off location sending
 				stopSendingLocation();
 				
-				//TODO: If location sending was successfully turned off, change
+				// If location sending was successfully turned off, change
 				// the toggle text to Board
 				item.setTitle(R.string.actionBoardBus);
 			}
 			return true;
 		}
-		//TODO: Determine if the user chose the Discovery Park menu item
+		// Determine if the user chose the Discovery Park menu item
 		else if (item.getItemId()==R.id.discParkRoute)
 		{
-			//TODO: Set the route to Discovery Park
+			// Set the route to Discovery Park
 			setRoute(getString(R.string.discParkRoute));
 			return true;
 		}
@@ -199,7 +197,7 @@ public class RouteActivity extends Activity
 		}
 	}
 	
-	//TODO: Returns whether the RouteActivity is sending location
+	// Returns whether the RouteActivity is sending location
 	public boolean isSendingLocation()
 	{
 		return sendingLocation;
@@ -213,13 +211,13 @@ public class RouteActivity extends Activity
 		locUpdTimer = new LocationSendingTimer();
 		locUpdTimer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MIN_TIME_BTWN_UPDATES);
 		
-		//TODO: If GPS polling is not enabled, enable it
+		// If GPS polling is not enabled, enable it
 		if (!gps.isPolling())
 		{
 			gps.startPolling();
 		}
 		
-		//TODO: To prevent other Fragments and Activities from stopping GPS polling,
+		// To prevent other Fragments and Activities from stopping GPS polling,
 		// place a polling lock on GPSretrieve
 		gps.lockPollingState();
 		
@@ -234,7 +232,7 @@ public class RouteActivity extends Activity
 		// Stop sending the location to the server
 		locUpdTimer.cancel(false);
 		
-		//TODO: Release the lock on GPSretrieve placed when sending location
+		// Release the lock on GPSretrieve placed when sending location
 		gps.unlockPollingState();
 		
 		// Set sendingLocation to false to indicate that sending location has stopped

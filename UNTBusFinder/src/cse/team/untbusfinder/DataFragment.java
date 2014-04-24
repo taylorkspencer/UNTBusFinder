@@ -4,15 +4,6 @@ package cse.team.untbusfinder;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Overlay;
-import org.osmdroid.views.overlay.OverlayManager;
-import org.osmdroid.views.overlay.PathOverlay;
-import org.osmdroid.events.MapListener;
-import org.osmdroid.events.ScrollEvent;
-import org.osmdroid.events.ZoomEvent;
-
 import android.app.Fragment;
 import android.graphics.Color;
 import android.location.Location;

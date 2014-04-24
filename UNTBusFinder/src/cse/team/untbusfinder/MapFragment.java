@@ -30,8 +30,6 @@ public class MapFragment extends Fragment
 {
 	// Variables declared here so that they can be accessed in the LocationListeners
 	// and MapListener
-	//TODO: Move location sending code to the RouteActivity so we don't have two
-	// Activities sending location simultaneously
 	MapView mapView;
 	GPSretrieve gps;
 	LocationCommunicator link;
@@ -77,19 +75,8 @@ public class MapFragment extends Fragment
 		busPathOverlays = new ArrayList<PathOverlay>();
 		busStopOverlays = new ArrayList<PointOverlay>();
 		busLocOverlays = new ArrayList<PointOverlay>();
-		return v;
-	}
-	
-	@Override public void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-	}
-	
-	// Set the initial locations of the MapView and its Overlays
-	@Override public void onStart()
-	{
-		super.onStart();
 		
+		// Set the initial locations of the MapView and its Overlays
 		// Get the last known location from GPSretrieve and set the map
 		// control to that
 		if (gps.getLocation()!=null)
@@ -158,8 +145,7 @@ public class MapFragment extends Fragment
 			}
 		});
 		
-		//TODO: Listen for a location update from LocationCommunicator and if one is
-		// received, change the map control to that location
+		// Listen for a location update from LocationCommunicator
 		link.requestLocationUpdates(new LocationListener()
 		{
 			@Override public void onLocationChanged(Location location)
@@ -173,11 +159,11 @@ public class MapFragment extends Fragment
 					// and set its point in the direction of the change
 					if (link.getLastLocation()!=null)
 					{
-						//TODO: Look through the busLocOverlays list for a PointOverlay
+						// Look through the busLocOverlays list for a PointOverlay
 						// with the same location as the last location
 						for (int point=0, pntFound=0; ((point<busLocOverlays.size())&&(pntFound==0)); point++)
 						{
-							//TODO: If the location of this point is equal to the last location, remove
+							// If the location of this point is equal to the last location, remove
 							// it and exit the loop
 							if (busLocOverlays.get(point).getLocation().equals(link.getLastLocation()))
 							{
@@ -227,11 +213,11 @@ public class MapFragment extends Fragment
 			}
 		});
 		
-		//TODO: Display the path for the Discovery Park route (temporary implementation
+		// Display the path for the Discovery Park route (temporary implementation
 		// until we start getting this from the server)
 		addDiscParkBusRoute();
 		
-		//TODO: Add the bus stops for the Discovery Park route (temporary implementation
+		// Add the bus stops for the Discovery Park route (temporary implementation
 		// until we start getting this from the server)
 		addDiscParkBusRouteStops();
 		
@@ -255,6 +241,18 @@ public class MapFragment extends Fragment
 		
 		// Have the map center on the user's location until the user changes the focus
 		centerOnMyLocation = true;
+		
+		return v;
+	}
+	
+	@Override public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+	}
+	
+	@Override public void onStart()
+	{
+		super.onStart();
 	}
 	
 	// Start and/or resume polling for location

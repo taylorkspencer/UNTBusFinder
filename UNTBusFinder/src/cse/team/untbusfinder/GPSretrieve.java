@@ -63,7 +63,7 @@ public class GPSretrieve extends Service implements LocationListener
 		pollingStateLock = true;
 	}
 	
-	//TODO: Disables the polling lock (used by the location sending methods
+	// Disables the polling lock (used by the location sending methods
 	// to prevent GPS polling from going off)
 	public void unlockPollingState()
 	{
@@ -73,10 +73,10 @@ public class GPSretrieve extends Service implements LocationListener
 	// Start polling for location updates
 	public void startPolling()
 	{
-		//TODO: If the polling state is locked, do nothing
+		// If the polling state is locked, do nothing
 		if (!isPollingStateLocked())
 		{
-			//TODO: Only enable polling if it is not already enabled
+			// Only enable polling if it is not already enabled
 			if (!isPolling())
 			{
 				try
@@ -109,10 +109,10 @@ public class GPSretrieve extends Service implements LocationListener
 	// Stop polling for location updates
 	public void stopPolling()
 	{
-		//TODO: If the polling state is locked, do nothing
+		// If the polling state is locked, do nothing
 		if (!isPollingStateLocked())
 		{
-			//TODO: Only disable polling if it is already enabled
+			// Only disable polling if it is already enabled
 			if (isPolling())
 			{
 				try
@@ -132,7 +132,7 @@ public class GPSretrieve extends Service implements LocationListener
 		}
 	}
 	
-	//TODO: Returns the state of the polling lock (used by the location
+	// Returns the state of the polling lock (used by the location
 	// sending methods to prevent GPS polling from going off)
 	public boolean isPollingStateLocked()
 	{

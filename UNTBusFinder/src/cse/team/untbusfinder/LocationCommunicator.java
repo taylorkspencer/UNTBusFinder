@@ -106,14 +106,14 @@ public class LocationCommunicator extends Service
 		return serverURL;
 	}
 	
-	//TODO: Enables the polling lock (used by the location sending methods
+	// Enables the polling lock (used by the location sending methods
 	// to prevent GPS polling from going off)
 	public void lockPollingState()
 	{
 		pollingStateLock = true;
 	}
 	
-	//TODO: Disables the polling lock (used by the location sending methods
+	// Disables the polling lock (used by the location sending methods
 	// to prevent GPS polling from going off)
 	public void unlockPollingState()
 	{
@@ -123,10 +123,10 @@ public class LocationCommunicator extends Service
 	// Start polling the server for location updates
 	public void startPolling()
 	{
-		//TODO: If the polling state is locked, do nothing
+		// If the polling state is locked, do nothing
 		if (!isPollingStateLocked())
 		{
-			//TODO: Only enable polling if it is not already enabled
+			// Only enable polling if it is not already enabled
 			if (!isPolling())
 			{
 				// Check to make sure the server URL is not null or empty
@@ -148,10 +148,10 @@ public class LocationCommunicator extends Service
 	// Stop polling the server for location updates
 	public void stopPolling()
 	{
-		//TODO: If the polling state is locked, do nothing
+		// If the polling state is locked, do nothing
 		if (!isPollingStateLocked())
 		{
-			//TODO: Only disable polling if it is already enabled
+			// Only disable polling if it is already enabled
 			if (isPolling())
 			{
 				// Stop querying the server for location updates
@@ -163,7 +163,7 @@ public class LocationCommunicator extends Service
 		}
 	}
 	
-	//TODO: Returns the state of the polling lock (used by the location
+	// Returns the state of the polling lock (used by the location
 	// sending methods to prevent GPS polling from going off)
 	public boolean isPollingStateLocked()
 	{
@@ -273,7 +273,7 @@ public class LocationCommunicator extends Service
 				return null;
 			}
 			
-			//TODO: Add our user-agent
+			// Add our user-agent
 			try
 			{
 				locServerHTTPget.addHeader("User-Agent", "UNTBusFinder/"+getPackageManager().getPackageInfo(getPackageName(), 0).versionName+" (Android)");
@@ -300,17 +300,17 @@ public class LocationCommunicator extends Service
 				return null;
 			}
 			
-			//TODO: Parse the server response to a string and return it
+			// Parse the server response to a string and return it
 			try
 			{
 				return EntityUtils.toString(locServerResponse.getEntity());
 			}
-			//TODO: If an IOException occurred, return null
+			// If an IOException occurred, return null
 			catch (IOException responseIOexception)
 			{
 				return null;
 			}
-			//TODO: If an ParseException occurred, return null
+			// If an ParseException occurred, return null
 			catch (ParseException responseParseException)
 			{
 				return null;
@@ -319,7 +319,7 @@ public class LocationCommunicator extends Service
 		
 		@Override protected void onPostExecute(String locServerResponse)
 		{
-			//TODO: If the server returned a response, parse it into JSON
+			// If the server returned a response, parse it into JSON
 			if (locServerResponse!=null)
 			{
 				JSONObject responseJSON = null;
@@ -363,7 +363,7 @@ public class LocationCommunicator extends Service
 					toSend.setLatitude(newLocation.getLatitude());
 					toSend.setLongitude(newLocation.getLongitude());
 					
-					//TODO: If the previous location is not null, set the bearing of the new location
+					// If the previous location is not null, set the bearing of the new location
 					if (location!=null)
 					{
 						toSend.setBearing((float)newLocation.bearingTo(location));
@@ -382,7 +382,7 @@ public class LocationCommunicator extends Service
 				// Renew the locationQueryTimer
 				taskTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES);
 			}
-			//TODO: If polling failed, stop polling
+			// If polling failed, stop polling
 			else
 			{
 				stopPolling();
