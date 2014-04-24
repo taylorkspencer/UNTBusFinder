@@ -1,6 +1,5 @@
 package cse.team.untbusfinder;
 
-//TODO: Clean out imports
 import org.osmdroid.util.GeoPoint;
 
 import android.os.AsyncTask;
@@ -8,14 +7,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.app.Activity;
 import android.app.ActionBar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
-import android.support.v4.app.NavUtils;
-import android.app.Fragment;
 
 public class RouteActivity extends Activity
 {
@@ -283,17 +277,21 @@ public class RouteActivity extends Activity
 		
 		@Override protected void onPostExecute(Boolean success)
 		{
-			// If sending the location was successful, renew the locationSenderTimer
-			if (success)
+			// If the LocationSendingTimer is being cancelled, do not renew its timer
+			if (!isCancelled())
 			{
-				taskTimer.postDelayed(this, taskInterval);
-			}
-			// If sending location failed, stop retrieving locations, display an error
-			// message toast, and change the toggle text to Send My Location
-			else
-			{
-				stopSendingLocation();
-				onLocationSendingError();
+				// If sending the location was successful, renew the locationSenderTimer
+				if (success)
+				{
+					taskTimer.postDelayed(this, taskInterval);
+				}
+				// If sending location failed, stop retrieving locations, display an error
+				// message toast, and change the toggle text to Send My Location
+				else
+				{
+					stopSendingLocation();
+					onLocationSendingError();
+				}
 			}
 		}
 	}
