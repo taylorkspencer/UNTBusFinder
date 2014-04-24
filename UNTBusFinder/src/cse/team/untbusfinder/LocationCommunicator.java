@@ -379,12 +379,8 @@ public class LocationCommunicator extends Service
 					location = newLocation;
 				}
 				
-				// If the LocationReceivingTimer is being cancelled, do not renew its timer
-				if (!isCancelled())
-				{
-					// Renew the locationQueryTimer
-					taskTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES);
-				}
+				// Renew the locationQueryTimer
+				taskTimer.postDelayed(this, MIN_TIME_BTWN_UPDATES);
 			}
 			// If polling failed, stop polling
 			else

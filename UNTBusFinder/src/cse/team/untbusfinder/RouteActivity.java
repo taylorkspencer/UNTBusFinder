@@ -277,21 +277,17 @@ public class RouteActivity extends Activity
 		
 		@Override protected void onPostExecute(Boolean success)
 		{
-			// If the LocationSendingTimer is being cancelled, do not renew its timer
-			if (!isCancelled())
+			// If sending the location was successful, renew the locationSenderTimer
+			if (success)
 			{
-				// If sending the location was successful, renew the locationSenderTimer
-				if (success)
-				{
-					taskTimer.postDelayed(this, taskInterval);
-				}
-				// If sending location failed, stop retrieving locations, display an error
-				// message toast, and change the toggle text to Send My Location
-				else
-				{
-					stopSendingLocation();
-					onLocationSendingError();
-				}
+				taskTimer.postDelayed(this, taskInterval);
+			}
+			// If sending location failed, stop retrieving locations, display an error
+			// message toast, and change the toggle text to Send My Location
+			else
+			{
+				stopSendingLocation();
+				onLocationSendingError();
 			}
 		}
 	}
