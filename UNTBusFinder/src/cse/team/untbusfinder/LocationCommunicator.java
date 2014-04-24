@@ -54,6 +54,9 @@ public class LocationCommunicator extends Service
 	// Static instance of this Service (so Activities can access it)
 	static LocationCommunicator sInstance;
 	
+	// Static instance of the LocationSendingTimer (so RouteActivity can access it)
+	static AsyncTask lstInstance;
+	
 	// An ArrayList of LocationListeners is declared here so that other classes
 	// can listen for location updates
 	ArrayList<LocationListener> listeners = new ArrayList<LocationListener>();
@@ -92,6 +95,18 @@ public class LocationCommunicator extends Service
 	static public LocationCommunicator getInstance()
 	{
 		return sInstance;
+	}
+	
+	// Return the LocationSendingTimer
+	static public AsyncTask getLocationSendingTimer()
+	{
+		return lstInstance;
+	}
+	
+	// Create a LocationSendingTimer
+	public void setLocationSendingTimer(AsyncTask newLst)
+	{
+		lstInstance = newLst;
 	}
 	
 	// Sets the URL for the server to be queried by the LocationCommunicator

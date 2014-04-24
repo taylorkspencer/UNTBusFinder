@@ -56,7 +56,7 @@ public class GPSretrieve extends Service implements LocationListener
 		return sInstance;
 	}
 	
-	//TODO: Enables the polling lock (used by the location sending methods
+	// Enables the polling lock (used by the location sending methods
 	// to prevent GPS polling from going off)
 	public void lockPollingState()
 	{

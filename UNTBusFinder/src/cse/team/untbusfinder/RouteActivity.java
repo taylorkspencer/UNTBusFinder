@@ -15,11 +15,10 @@ public class RouteActivity extends Activity
 {
 	GPSretrieve gps;
 	LocationCommunicator link;
-	LocationSendingTimer locUpdTimer;
 	String currentRoute;
 	String defaultRoute;
 	
-	boolean sendingLocation;
+	boolean sendingLocation = false;
 	
 	// Constants
 	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
@@ -42,15 +41,32 @@ public class RouteActivity extends Activity
 		// Set the URL of the server to be queried by the LocationCommunicator
 		link.setServerURL("http://untbusfinder.no-ip.org/");
 		
+		// If the LocationCommunicator service has a LocationSendingTimer, use
+		// it to determine if we are sending location
+		if (link.getLocationSendingTimer()!=null)
+		{
+			// If the LocationSendingTimer has not been cancelled, set sendingLocation to true
+			if (!link.getLocationSendingTimer().isCancelled())
+			{
+				sendingLocation = true;
+			}
+			// If the LocationSendingTimer has been cancelled, set sendingLocation to false
+			else
+			{
+				sendingLocation = false;
+			}
+		}
+		// If there is no savedInstanceState, set sendingLocation to false
+		else
+		{
+			sendingLocation = false;
+		}
+		
 		// Adjust the action bar for this activity
 		setupActionBar();
 		
 		// Set the current route for this Activity
 		setRoute(defaultRoute);
-		
-		// Set sendingLocation to false
-		//TODO: Determine the current state of location sending
-		sendingLocation = false;
 	}
 	
 	protected String getRoute()
@@ -202,8 +218,9 @@ public class RouteActivity extends Activity
 	{
 		// Query the server for location updates and if one is received,
 		// send the new location to any listeners
-		locUpdTimer = new LocationSendingTimer();
-		locUpdTimer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MIN_TIME_BTWN_UPDATES);
+		LocationSendingTimer lst = new LocationSendingTimer();
+		lst.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MIN_TIME_BTWN_UPDATES);
+		link.setLocationSendingTimer(lst);
 		
 		// If GPS polling is not enabled, enable it
 		if (!gps.isPolling())
@@ -224,7 +241,8 @@ public class RouteActivity extends Activity
 	public void stopSendingLocation()
 	{
 		// Stop sending the location to the server
-		locUpdTimer.cancel(false);
+		LocationSendingTimer lst = (LocationSendingTimer)link.getLocationSendingTimer();
+		lst.cancel(false);
 		
 		// Release the lock on GPSretrieve placed when sending location
 		gps.unlockPollingState();
@@ -248,7 +266,9 @@ public class RouteActivity extends Activity
 		
 		@Override public void run()
 		{
-			new LocationSendingTimer().execute(taskInterval);
+			LocationSendingTimer lst = new LocationSendingTimer();
+			lst.execute(taskInterval);
+			link.setLocationSendingTimer(lst);
 		}
 		
 		@Override protected void onPreExecute()
