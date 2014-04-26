@@ -5,6 +5,5 @@
 	<org.osmdroid.views.MapView
 		  android:id="@+id/generalMap"
 		  android:layout_width="fill_parent"
-		  android:layout_height="fill_parent"
-		  android:clickable="true"/>
+		  android:layout_height="fill_parent"/>
 </LinearLayout>

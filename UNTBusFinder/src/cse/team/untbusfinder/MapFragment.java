@@ -76,14 +76,6 @@ public class MapFragment extends Fragment
 		busStopOverlays = new ArrayList<PointOverlay>();
 		busLocOverlays = new ArrayList<PointOverlay>();
 		
-		// Set the initial locations of the MapView and its Overlays
-		// Get the last known location from GPSretrieve and set the map
-		// control to that
-		if (gps.getLocation()!=null)
-		{
-			mapView.getController().setCenter(new GeoPoint(gps.getLocation()));
-		}
-		
 		// Listen for a location update from GPSretrieve and if one is received,
 		// change the map control to that location
 		gps.requestLocationUpdates(new LocationListener()
@@ -263,6 +255,56 @@ public class MapFragment extends Fragment
 		
 		// Begin polling for location from LocationCommunicator
 		link.startPolling();
+		
+		//TODO: If available, display the most recent location from GPSretrieve
+		if (gps.getLocation()!=null)
+		{
+			// If the user has not moved the focus, center the map on the changed location
+			if (centerOnMyLocation)
+			{
+				mapView.getController().setCenter(new GeoPoint(gps.getLocation()));
+				
+				// Since changing the center of the map will set centerOnMyLocation to
+				// false, reset centerOnMyLocation to true
+				centerOnMyLocation = true;
+			}
+			
+			//TODO: If the location has a bearing, declare a MotionPointOverlay
+			// and set its point in the direction of the change
+			if (gps.hasBearing())
+			{
+				// Declare the myLocOverlay as a MotionPointOverlay
+				myLocOverlay = new MotionPointOverlay(mapView.getContext());
+				
+				//TODO: Determine the direction of the change (this needs to be further tested)
+				myLocOverlay.setBearing(gps.getLocation().getBearing());
+			}
+			else
+			{
+				// Declare the myLocOverlay as a StationaryPointOverlay
+				myLocOverlay = new StationaryPointOverlay(mapView.getContext());
+			}
+			// Set the shared default attributes of the point
+			myLocOverlay = setMyLocOverlayAttributes(myLocOverlay);
+			
+			// Update the myLocOverlay to the changed location
+			myLocOverlay.setLocation(new GeoPoint(gps.getLocation()));
+		}
+		
+		//TODO: If available, display the most recent location from LocationCommunicator
+		if (link.getLocation()!=null)
+		{
+			PointOverlay busLocOverlay = new StationaryPointOverlay(mapView.getContext());;
+			
+			// Set the shared default attributes of the point
+			busLocOverlay = setBusLocOverlayAttributes(busLocOverlay);
+			
+			// Set the location of the busLocOverlay to the changed location
+			busLocOverlay.setLocation(new GeoPoint(link.getLocation()));
+			
+			// Add the point to the busLocOverlays array
+			busLocOverlays.add(busLocOverlay);
+		}
 		
 		super.onResume();
 	}
