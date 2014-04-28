@@ -201,8 +201,24 @@ public class GPSretrieve extends Service implements LocationListener
 		// is more accurate
 		if (lastLocation!=null)
 		{
-			// Determine which provider this is coming from
-			if (location.getProvider()==LocationManager.GPS_PROVIDER)
+			// Determine if the previous location has expired
+			long timeSinceLastLocation;
+			
+			if (Build.VERSION.SDK_INT>=17)
+			{
+				timeSinceLastLocation = location.getElapsedRealtimeNanos()-lastLocation.getElapsedRealtimeNanos();
+			}
+			else
+			{
+				timeSinceLastLocation = location.getTime()-lastLocation.getTime();
+			}
+			
+			if (timeSinceLastLocation>=MAX_TIME_BTWN_UPDATES)
+			{
+				// If so, accept this location
+			}
+			// If not, determine which provider this is coming from
+			else if (location.getProvider()==LocationManager.GPS_PROVIDER)
 			{
 				// If this is coming from the GPS provider, always accept, as
 				// the GPS provider is the most accurate provider we have
@@ -227,28 +243,9 @@ public class GPSretrieve extends Service implements LocationListener
 						// previous location
 						if (location.getAccuracy()<lastLocation.getAccuracy())
 						{
-							// If the last location was more accurate, determine if it
-							// has expired
-							long timeSinceLastLocation;
-							
-							if (Build.VERSION.SDK_INT>=17)
-							{
-								timeSinceLastLocation = location.getElapsedRealtimeNanos()-lastLocation.getElapsedRealtimeNanos();
-							}
-							else
-							{
-								timeSinceLastLocation = location.getTime()-lastLocation.getTime();
-							}
-							
-							if (timeSinceLastLocation>=MAX_TIME_BTWN_UPDATES)
-							{
-								// If so, accept this location
-							}
-							else
-							{
-								// If not, discard this location
-								return;
-							}
+							// If the last location was more accurate, discard
+							// this location
+							return;
 						}
 					}
 				}
