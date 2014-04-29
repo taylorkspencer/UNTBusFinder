@@ -256,7 +256,7 @@ public class MapFragment extends Fragment
 		// Begin polling for location from LocationCommunicator
 		link.startPolling();
 		
-		//TODO: If available, display the most recent location from GPSretrieve
+		// If available, display the most recent location from GPSretrieve
 		if (gps.getLocation()!=null)
 		{
 			// If the user has not moved the focus, center the map on the changed location
@@ -291,7 +291,7 @@ public class MapFragment extends Fragment
 			myLocOverlay.setLocation(new GeoPoint(gps.getLocation()));
 		}
 		
-		//TODO: If available, display the most recent location from LocationCommunicator
+		// If available, display the most recent location from LocationCommunicator
 		if (link.getLocation()!=null)
 		{
 			PointOverlay busLocOverlay = new StationaryPointOverlay(mapView.getContext());;

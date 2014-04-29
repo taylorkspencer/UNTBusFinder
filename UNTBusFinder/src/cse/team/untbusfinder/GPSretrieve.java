@@ -197,70 +197,69 @@ public class GPSretrieve extends Service implements LocationListener
 	@SuppressLint("NewApi")
 	@Override public void onLocationChanged(Location location)
 	{
-		// If there is a previous location, check if the previous location
-		// is more accurate
-		if (lastLocation!=null)
+		// If this location is null, just ignore it
+		if (location!=null)
 		{
-			// Determine if the previous location has expired
-			long timeSinceLastLocation;
-			
-			if (Build.VERSION.SDK_INT>=17)
+			// If there is a previous location, check if the previous location
+			// is more accurate
+			if (lastLocation!=null)
 			{
-				timeSinceLastLocation = location.getElapsedRealtimeNanos()-lastLocation.getElapsedRealtimeNanos();
-			}
-			else
-			{
-				timeSinceLastLocation = location.getTime()-lastLocation.getTime();
-			}
-			
-			if (timeSinceLastLocation>=MAX_TIME_BTWN_UPDATES)
-			{
-				// If so, accept this location
-			}
-			// If not, determine which provider this is coming from
-			else if (location.getProvider()==LocationManager.GPS_PROVIDER)
-			{
-				// If this is coming from the GPS provider, always accept, as
-				// the GPS provider is the most accurate provider we have
-			}
-			// If this is not coming from the GPS provider, see if a more
-			// accurate location is available
-			else
-			{
-				// Determine if the GPS provider is still enabled
-				if (isGPSEnabled)
+				// Determine if the previous location has expired
+				long timeSinceLastLocation;
+				
+				if (Build.VERSION.SDK_INT>=17)
 				{
-					// If so, discard this location
-					return;
+					timeSinceLastLocation = location.getElapsedRealtimeNanos()-lastLocation.getElapsedRealtimeNanos();
 				}
 				else
 				{
-					// If not, determine if the previous location came from a
-					// network provider
-					if (lastLocation.getProvider()==LocationManager.NETWORK_PROVIDER)
+					timeSinceLastLocation = location.getTime()-lastLocation.getTime();
+				}
+				
+				if (timeSinceLastLocation>=MAX_TIME_BTWN_UPDATES)
+				{
+					// If so, accept this location
+				}
+				// If not, determine which provider this is coming from
+				else if (location.getProvider()==LocationManager.GPS_PROVIDER)
+				{
+					// If this is coming from the GPS provider, always accept, as
+					// the GPS provider is the most accurate provider we have
+				}
+				// If this is not coming from the GPS provider, see if a more
+				// accurate location is available
+				else
+				{
+					// Determine if the GPS provider is still enabled
+					if (isGPSEnabled)
 					{
-						// If so, compare the accuracy of this location to the
-						// previous location
-						if (location.getAccuracy()<lastLocation.getAccuracy())
+						// If so, discard this location
+						return;
+					}
+					else
+					{
+						// If not, determine if the previous location came from a
+						// network provider
+						if (lastLocation.getProvider()==LocationManager.NETWORK_PROVIDER)
 						{
-							// If the last location was more accurate, discard
-							// this location
-							return;
+							// If so, compare the accuracy of this location to the
+							// previous location
+							if (location.getAccuracy()<lastLocation.getAccuracy())
+							{
+								// If the last location was more accurate, discard
+								// this location
+								return;
+							}
 						}
 					}
 				}
 			}
-		}
-		
-		// Notify any listening threads about the location change
-		for (int lIndex=0; listeners.size()>lIndex; lIndex++)
-		{
-			listeners.get(lIndex).onLocationChanged(location);
-		}
-		
-		if (location!=null)
-		{
-			lastLocation = location;
+			
+			// Notify any listening threads about the location change
+			for (int lIndex=0; listeners.size()>lIndex; lIndex++)
+			{
+				listeners.get(lIndex).onLocationChanged(location);
+			}
 		}
 	}
 	
