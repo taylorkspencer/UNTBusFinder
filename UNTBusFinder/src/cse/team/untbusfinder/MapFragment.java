@@ -45,7 +45,7 @@ public class MapFragment extends Fragment
 	
 	// Constants
 	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
-	private static final long MAX_TIME_BTWN_UPDATES = 1000*1000; // In milliseconds (1,000s currently)
+	private static final long MAX_TIME_BTWN_UPDATES = 1000*100; // In milliseconds (100s currently)
 	private static final long MIN_TIME_BTWN_UPDATES = 1000*10; // In milliseconds (10s interval)
 	private static final int MAX_TIME_TO_WAIT = 1000*10; // In milliseconds (10 seconds)
 	

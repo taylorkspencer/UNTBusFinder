@@ -1,6 +1,7 @@
 package cse.team.untbusfinder;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
@@ -13,6 +14,7 @@ import android.location.LocationProvider;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
 
 public class GPSretrieve extends Service implements LocationListener
 {
@@ -35,7 +37,7 @@ public class GPSretrieve extends Service implements LocationListener
 	
 	// Constants
 	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
-	private static final long MAX_TIME_BTWN_UPDATES = 1000*1000; // In milliseconds (1,000s currently)
+	private static final long MAX_TIME_BTWN_UPDATES = 1000*100; // In milliseconds (100s currently)
 	private static final long MIN_TIME_BTWN_UPDATES = 1000*10; // In milliseconds (10s currently)
 	private static final int MAX_TIME_TO_WAIT = 1000*10; // In milliseconds (10 seconds)
 
@@ -153,16 +155,41 @@ public class GPSretrieve extends Service implements LocationListener
 	}
 	
 	// Return the most recent location available
+	@SuppressLint("NewApi")
 	public Location getLocation()
 	{
-		// If lastLocation is null, query the passive location providers for
-		// its last known location to provide a location until we get one
-		// from one of the providers
+		// If lastLocation is null, query the passive location provider for its
+		// last known location to provide a location until we get one from one
+		// of the providers
 		if (lastLocation==null)
 		{
-			locMgr.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+			return locMgr.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
 		}
-		return lastLocation;
+		else
+		{
+			// Determine if the previous location has expired
+			long timeSinceLastLocation;
+			
+			if (Build.VERSION.SDK_INT>=17)
+			{
+				timeSinceLastLocation = SystemClock.elapsedRealtimeNanos()-lastLocation.getElapsedRealtimeNanos();
+			}
+			else
+			{
+				Date now = new Date();
+				timeSinceLastLocation = now.getTime()-lastLocation.getTime();
+			}
+			
+			// If so, return a location from the passive location provider
+			if (timeSinceLastLocation>=MAX_TIME_BTWN_UPDATES)
+			{
+				return locMgr.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+			}
+			else
+			{
+				return lastLocation;
+			}
+		}
 	}
 	
 	// Return the latitude from the most recent location
@@ -227,11 +254,11 @@ public class GPSretrieve extends Service implements LocationListener
 				
 				if (Build.VERSION.SDK_INT>=17)
 				{
-					timeSinceLastLocation = location.getElapsedRealtimeNanos()-lastLocation.getElapsedRealtimeNanos();
+					timeSinceLastLocation = location.getElapsedRealtimeNanos()-getLocation().getElapsedRealtimeNanos();
 				}
 				else
 				{
-					timeSinceLastLocation = location.getTime()-lastLocation.getTime();
+					timeSinceLastLocation = location.getTime()-getLocation().getTime();
 				}
 				
 				if (timeSinceLastLocation>=MAX_TIME_BTWN_UPDATES)
