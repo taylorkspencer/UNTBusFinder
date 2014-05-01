@@ -36,6 +36,12 @@ public abstract class PointOverlay extends Overlay
 		super(resourceProxy);
 	}
 	
+	// Copy constructor for PointOverlay
+	public PointOverlay(PointOverlay copying)
+	{
+		super(copying.mResourceProxy);
+	}
+	
 	// Set the color for the PointOverlay
 	public void setColor(int newColor)
 	{

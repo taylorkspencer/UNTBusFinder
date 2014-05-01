@@ -381,7 +381,7 @@ public class LocationCommunicator extends Service
 					// If the previous location is not null, set the bearing of the new location
 					if (location!=null)
 					{
-						toSend.setBearing((float)newLocation.bearingTo(location));
+						toSend.setBearing((float)location.bearingTo(newLocation));
 					}
 					
 					// Notify any listening threads about the location change

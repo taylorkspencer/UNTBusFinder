@@ -31,6 +31,12 @@ public class StationaryPointOverlay extends PointOverlay
 		super(resourceProxy);
 	}
 	
+	// Copy constructor for StationaryPointOverlay
+	public StationaryPointOverlay(PointOverlay copying)
+	{
+		super(copying);
+	}
+	
 	// Set the bearing for the StationaryPointOverlay
 	// Does nothing, as StationaryPointOverlay has no bearing
 	public void setBearing(float newBearing)
@@ -56,7 +62,7 @@ public class StationaryPointOverlay extends PointOverlay
 			if (!shadow)
 			{
 				final Projection proj = mapView.getProjection();
-				proj.toMapPixels(pLocation, screenCoords);
+				proj.toPixels(pLocation, screenCoords);
 				
 				// Draw the circle with the color and radius defined
 				canvas.drawCircle(screenCoords.x, screenCoords.y, radius, pPaint);

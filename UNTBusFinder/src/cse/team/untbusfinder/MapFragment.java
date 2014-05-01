@@ -95,14 +95,14 @@ public class MapFragment extends Fragment
 						centerOnMyLocation = true;
 					}
 					
-					//TODO: If there was a previous location, declare a MotionPointOverlay
+					// If the point has a bearing, declare a MotionPointOverlay
 					// and set its point in the direction of the change
-					if ((gps.getLastLocation()!=null)&&(gps.hasBearing()))
+					if (location.hasBearing())
 					{
 						// Declare the myLocOverlay as a MotionPointOverlay
 						myLocOverlay = new MotionPointOverlay(mapView.getContext());
 						
-						//TODO: Determine the direction of the change (this needs to be further tested)
+						// Determine the direction of the change (this needs to be further tested)
 						myLocOverlay.setBearing(location.getBearing());
 					}
 					else
@@ -146,7 +146,7 @@ public class MapFragment extends Fragment
 				if (location!=null)
 				{
 					PointOverlay busLocOverlay;
-					//TODO: If there was a previous location, remove the previous
+					// If there was a previous location, remove the previous
 					// location from the array, declare a MotionPointOverlay,
 					// and set its point in the direction of the change
 					if (link.getLastLocation()!=null)
@@ -167,7 +167,7 @@ public class MapFragment extends Fragment
 						// Declare the busLocOverlay as a MotionPointOverlay
 						busLocOverlay = new MotionPointOverlay(mapView.getContext());
 						
-						//TODO: Determine the direction of the change (this needs to be further tested)
+						// Determine the direction of the change (this needs to be further tested)
 						busLocOverlay.setBearing(location.getBearing());
 					}
 					else
@@ -269,14 +269,14 @@ public class MapFragment extends Fragment
 				centerOnMyLocation = true;
 			}
 			
-			//TODO: If the location has a bearing, declare a MotionPointOverlay
+			// If the location has a bearing, declare a MotionPointOverlay
 			// and set its point in the direction of the change
 			if (gps.hasBearing())
 			{
 				// Declare the myLocOverlay as a MotionPointOverlay
 				myLocOverlay = new MotionPointOverlay(mapView.getContext());
 				
-				//TODO: Determine the direction of the change (this needs to be further tested)
+				// Determine the direction of the change (this needs to be further tested)
 				myLocOverlay.setBearing(gps.getLocation().getBearing());
 			}
 			else
@@ -372,26 +372,26 @@ public class MapFragment extends Fragment
 		busPathOverlays.add(discoveryParkRoutePath);
 	}
 	
-	//TODO: Add the bus stops for the Discovery Park route (temporary implementation
+	// Add the bus stops for the Discovery Park route (temporary implementation
 	// until we start getting this from the server)
 	protected void addDiscParkBusRouteStops()
 	{
-		//TODO: Add the first bus stop for the Discovery Park route
-		PointOverlay dpRouteStop1 = busStopOverlayStyle;
+		// Add the first bus stop for the Discovery Park route
+		PointOverlay dpRouteStop1 = new StationaryPointOverlay(busStopOverlayStyle);
 		dpRouteStop1 = setBusStopOverlayAttributes(dpRouteStop1);
 		dpRouteStop1.setColor(Color.parseColor("#009933"));
 		dpRouteStop1.setLocation(new GeoPoint(33.25340, -97.15394));
 		busStopOverlays.add(dpRouteStop1);
 		
-		//TODO: Add the second bus stop for the Discovery Park route
-		PointOverlay dpRouteStop2 = busStopOverlayStyle;
+		// Add the second bus stop for the Discovery Park route
+		PointOverlay dpRouteStop2 = new StationaryPointOverlay(busStopOverlayStyle);
 		dpRouteStop2 = setBusStopOverlayAttributes(dpRouteStop2);
 		dpRouteStop2.setColor(Color.parseColor("#009933"));
 		dpRouteStop2.setLocation(new GeoPoint(33.25372, -97.15073));
 		busStopOverlays.add(dpRouteStop2);
 		
-		//TODO: Add the third bus stop for the Discovery Park route
-		PointOverlay dpRouteStop3 = busStopOverlayStyle;
+		// Add the third bus stop for the Discovery Park route
+		PointOverlay dpRouteStop3 = new StationaryPointOverlay(busStopOverlayStyle);
 		dpRouteStop3 = setBusStopOverlayAttributes(dpRouteStop3);
 		dpRouteStop3.setColor(Color.parseColor("#009933"));
 		dpRouteStop3.setLocation(new GeoPoint(33.21396, -97.14843));

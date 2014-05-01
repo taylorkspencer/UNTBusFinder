@@ -180,13 +180,31 @@ public class GPSretrieve extends Service implements LocationListener
 	// Return the bearing from the most recent location
 	public double getBearing()
 	{
-		return getLocation().getBearing();
+		// Determine if this location has a bearing
+		if (hasBearing())
+		{
+			return getLocation().getBearing();
+		}
+		// If this location does not have a bearing, return 0.0
+		else
+		{
+			return 0.0;
+		}
 	}
 	
 	// Returns whether the most recent location has a bearing
 	public boolean hasBearing()
 	{
-		return getLocation().hasBearing();
+		// Determine if there is a location
+		if (getLocation()!=null)
+		{
+			return getLocation().hasBearing();
+		}
+		// If there is not a location, return false
+		else
+		{
+			return false;
+		}
 	}
 	
 	public boolean canGetLocation()
@@ -255,11 +273,21 @@ public class GPSretrieve extends Service implements LocationListener
 				}
 			}
 			
+			// If there is a previous location and it is different, calculate
+			// a bearing for this location based on the direction of change
+			if ((lastLocation!=null)&&(location.distanceTo(lastLocation)>0))
+			{
+				location.setBearing((float)lastLocation.bearingTo(location));
+			}
+			
 			// Notify any listening threads about the location change
 			for (int lIndex=0; listeners.size()>lIndex; lIndex++)
 			{
 				listeners.get(lIndex).onLocationChanged(location);
 			}
+			
+			// Set the last location equal to this location
+			lastLocation = location;
 		}
 	}
 	
