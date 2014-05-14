@@ -346,16 +346,19 @@ public class LocationCommunicator extends Service
 				catch (JSONException invalidJSON)
 				{
 					stopPolling();
+					return;
 				}
 				// If the JSON is invalid, stop polling and exit the function
 				catch (ParseException JSONparseException)
 				{
 					stopPolling();
+					return;
 				}
 				// If the server didn't return any JSON, stop polling and exit the function
 				catch (NullPointerException JSONnullException)
 				{
 					stopPolling();
+					return;
 				}
 				//TODO: Allow for retrieval of multiple locations
 				// Convert the JSON into a GeoPoint location
@@ -368,6 +371,7 @@ public class LocationCommunicator extends Service
 				catch (JSONException noLocationInJSON)
 				{
 					stopPolling();
+					return;
 				}
 				// If the previous location is null, or if a location is changed by
 				// MIN_DISTANCE_CHANGE_FOR_UPDATES or more, update the location
