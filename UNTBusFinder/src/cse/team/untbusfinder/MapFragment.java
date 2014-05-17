@@ -404,7 +404,7 @@ public class MapFragment extends Fragment
 		// Set the appearance attributes of the point
 		point.setAlpha(255);
 		point.setColor(Color.BLUE);
-		point.setRadius(10);
+		point.setRadius(15);
 		return point;
 	}
 	
@@ -413,7 +413,7 @@ public class MapFragment extends Fragment
 	{
 		// Set the appearance attributes of the point
 		point.setAlpha(255);
-		point.setRadius(10);
+		point.setRadius(15);
 		return point;
 	}
 	
@@ -422,7 +422,7 @@ public class MapFragment extends Fragment
 	{
 		// Set the appearance attributes of the point
 		point.setAlpha(255);
-		point.setRadius(10);
+		point.setRadius(15);
 		return point;
 	}
 	
