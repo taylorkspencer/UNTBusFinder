@@ -64,6 +64,9 @@ public class MapFragment extends Fragment
 		// Set the initial zoom level
 		mapView.getController().setZoom(15);
 		
+		// Enable pinch-to-zoom
+		mapView.setMultiTouchControls(true);
+		
 		// Set the URL of the server to be queried by the LocationCommunicator
 		link.setServerURL("http://untbusfinder.no-ip.org/");
 		
