@@ -8,11 +8,13 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayManager;
 import org.osmdroid.views.overlay.PathOverlay;
+import org.osmdroid.views.util.constants.MapViewConstants;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -23,7 +25,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.MotionEvent;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class MapFragment extends Fragment
@@ -34,6 +40,11 @@ public class MapFragment extends Fragment
 	GPSretrieve gps;
 	LocationCommunicator link;
 	PointOverlay myLocOverlay;
+	View mapToolbar;
+	ImageButton toolbarZoomOutButton;
+	ImageButton toolbarZoomInButton;
+	ImageButton toolbarCenterOnLocationButton;
+	Handler mapToolbarTimeoutTimer;
 	List<PointOverlay> busStopOverlays;
 	PointOverlay busStopOverlayStyle;
 	List<PointOverlay> busLocOverlays;
@@ -48,6 +59,7 @@ public class MapFragment extends Fragment
 	private static final long MAX_TIME_BTWN_UPDATES = 1000*100; // In milliseconds (100s currently)
 	private static final long MIN_TIME_BTWN_UPDATES = 1000*10; // In milliseconds (10s interval)
 	private static final int MAX_TIME_TO_WAIT = 1000*10; // In milliseconds (10 seconds)
+	private static final long MAP_TOOLBAR_TIMEOUT = 1000*10; // In milliseconds (10s interval)
 	
 	// Display the fragment and register the controls
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -60,7 +72,7 @@ public class MapFragment extends Fragment
 		
 		// Set up the OpenStreetMaps view
 		mapView = (MapView)v.findViewById(R.id.generalMap);
-		mapView.setBuiltInZoomControls(true);
+		
 		// Set the initial zoom level
 		mapView.getController().setZoom(15);
 		
@@ -229,8 +241,34 @@ public class MapFragment extends Fragment
 			
 			@Override public boolean onZoom(ZoomEvent event)
 			{
-				// Do nothing - we don't care about this change
+				// Re-set the state of the items in the map toolbar in
+				// case an item has to be disabled
+				setMapToolbarButtonsState();
 				return true;
+			}
+		});
+		
+		// Save the controls for the map toolbar
+		mapToolbar = v.findViewById(R.id.generalMapToolbar);
+		toolbarZoomOutButton = (ImageButton)v.findViewById(R.id.generalMapZoomOut);
+		toolbarZoomInButton = (ImageButton)v.findViewById(R.id.generalMapZoomIn);
+		toolbarCenterOnLocationButton = (ImageButton)v.findViewById(R.id.generalMapCenterOnLocation);
+		
+		// Set up the map toolbar for the MapView
+		setUpMapToolbar();
+		
+		// Add a TouchListener to the MapView to show the map toolbar
+		mapView.setOnTouchListener(new OnTouchListener()
+		{
+			@Override public boolean onTouch(View view, MotionEvent event)
+			{
+				// If the map toolbar is not visible, show the map toolbar
+				if (mapToolbar.getVisibility()!=View.VISIBLE)
+				{
+					showMapToolbar();
+				}
+				// Return false so other listeners can receive their events
+				return false;
 			}
 		});
 		
@@ -308,8 +346,130 @@ public class MapFragment extends Fragment
 			// Add the point to the busLocOverlays array
 			busLocOverlays.add(busLocOverlay);
 		}
-		
 		super.onResume();
+	}
+	
+	// Sets up the actions for the items in the map toolbar
+	protected void setUpMapToolbar()
+	{
+		final Runnable hideMapToolbar = new Runnable()
+		{
+			@Override public void run()
+			{
+				hideMapToolbar();
+			}
+		};
+		
+		// Add the action for the Zoom Out button
+		toolbarZoomOutButton.setOnClickListener(new OnClickListener()
+		{
+			@Override public void onClick(View view)
+			{
+				// Zoom out on the map
+				mapView.getController().zoomOut();
+				
+				// Reset the map toolbar timeout timer
+				mapToolbarTimeoutTimer.removeCallbacks(hideMapToolbar);
+				mapToolbarTimeoutTimer.postDelayed(hideMapToolbar, MAP_TOOLBAR_TIMEOUT);
+			}
+		});
+		
+		// Add the action for the Zoom In button
+		toolbarZoomInButton.setOnClickListener(new OnClickListener()
+		{
+			@Override public void onClick(View view)
+			{
+				// Zoom in on the map
+				mapView.getController().zoomIn();
+				
+				// Reset the map toolbar timeout timer
+				mapToolbarTimeoutTimer.removeCallbacks(hideMapToolbar);
+				mapToolbarTimeoutTimer.postDelayed(hideMapToolbar, MAP_TOOLBAR_TIMEOUT);
+			}
+		});
+		
+		// Add the action for the Center on Location button
+		toolbarCenterOnLocationButton.setOnClickListener(new OnClickListener()
+		{
+			@Override public void onClick(View view)
+			{
+				// Center the map on the location
+				mapView.getController().animateTo(new GeoPoint(gps.getLocation()));
+				
+				// Have the map center on the user's location until the user changes the focus
+				centerOnMyLocation = true;
+				
+				// Reset the map toolbar timeout timer
+				mapToolbarTimeoutTimer.removeCallbacks(hideMapToolbar);
+				mapToolbarTimeoutTimer.postDelayed(hideMapToolbar, MAP_TOOLBAR_TIMEOUT);
+			}
+		});
+		
+		// Create a timer to hide the map 
+		mapToolbarTimeoutTimer = new Handler();
+		mapToolbarTimeoutTimer.postDelayed(hideMapToolbar, MAP_TOOLBAR_TIMEOUT);
+	}
+	
+	// Set the states for the buttons on the map toolbar
+	public void setMapToolbarButtonsState()
+	{
+		// Determine if we can zoom out
+		if (mapView.canZoomOut())
+		{
+			// If so, enable the Zoom Out button
+			toolbarZoomOutButton.setEnabled(true);
+			toolbarZoomOutButton.setImageResource(R.drawable.zoom_out_button);
+		}
+		else
+		{
+			// If so, disable the Zoom Out button
+			toolbarZoomOutButton.setEnabled(false);
+			toolbarZoomOutButton.setImageResource(R.drawable.zoom_out_disabled);
+		}
+		
+		// Determine if we can zoom in
+		if (mapView.canZoomIn())
+		{
+			// If so, enable the Zoom In button
+			toolbarZoomInButton.setEnabled(true);
+			toolbarZoomInButton.setImageResource(R.drawable.zoom_in_button);
+		}
+		else
+		{
+			// If so, disable the Zoom In button
+			toolbarZoomInButton.setEnabled(false);
+			toolbarZoomInButton.setImageResource(R.drawable.zoom_in_disabled);
+		}
+		
+		// Determine if we have a location
+		if (gps.getLocation()!=null)
+		{
+			// If so, enable the Center on Location button
+			toolbarCenterOnLocationButton.setEnabled(true);
+			toolbarCenterOnLocationButton.setImageResource(R.drawable.center_on_location_button);
+		}
+		else
+		{
+			// If not, disable the Center on Location button
+			toolbarCenterOnLocationButton.setEnabled(false);
+			toolbarCenterOnLocationButton.setImageResource(R.drawable.center_on_location_disabled);
+		}
+	}
+	
+	// Show the map toolbar from the MapView
+	public void showMapToolbar()
+	{
+		// Set the states for the buttons on the map toolbar
+		setMapToolbarButtonsState();
+		
+		// Show the map toolbar
+		mapToolbar.setVisibility(View.VISIBLE);
+	}
+	
+	// Hide the map toolbar from the MapView
+	public void hideMapToolbar()
+	{
+		mapToolbar.setVisibility(View.GONE);
 	}
 	
 	// Display the path for the Discovery Park route (temporary implementation

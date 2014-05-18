@@ -1,9 +1,31 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	  android:layout_width="fill_parent"
-	  android:layout_height="fill_parent"
-	  android:orientation="vertical">
+	  android:layout_height="fill_parent">
 	<org.osmdroid.views.MapView
 		  android:id="@+id/generalMap"
 		  android:layout_width="fill_parent"
 		  android:layout_height="fill_parent"/>
-</LinearLayout>
+	<LinearLayout android:id="@+id/generalMapToolbar"
+		  android:layout_width="wrap_content"
+		  android:layout_height="wrap_content"
+		  android:orientation="horizontal"
+		  android:layout_alignParentBottom="true"
+		  android:layout_alignParentRight="true"
+		  android:visibility="gone">
+		<ImageButton android:id="@+id/generalMapZoomOut"
+			  android:contentDescription="@string/zoom_out_button"
+			  android:background="#DDFFFFFF"
+			  android:layout_width="40dp" android:layout_height="40dp"
+			  android:layout_margin="2pt" android:padding="2pt"/>
+		<ImageButton android:id="@+id/generalMapZoomIn"
+			  android:contentDescription="@string/zoom_in_button"
+			  android:background="#DDFFFFFF"
+			  android:layout_width="40dp" android:layout_height="40dp"
+			  android:layout_margin="2pt" android:padding="2pt"/>
+		<ImageButton android:id="@+id/generalMapCenterOnLocation"
+			  android:contentDescription="@string/center_on_location_button"
+			  android:background="#DDFFFFFF"
+			  android:layout_width="40dp" android:layout_height="40dp"
+			  android:layout_margin="2pt" android:padding="2pt"/>
+	</LinearLayout>
+</RelativeLayout>

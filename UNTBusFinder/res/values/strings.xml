@@ -8,4 +8,7 @@
 	<string name="actionBoardBus">Board</string>
 	<string name="actionLeaveBus">Leave</string>
 	<string name="discParkRoute">Discovery Park</string>
+	<string name="zoom_out_button">Zoom Out</string>
+	<string name="zoom_in_button">Zoom In</string>
+	<string name="center_on_location_button">Center on Location</string>
 </resources>
